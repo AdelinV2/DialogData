@@ -33,10 +33,5 @@ public class Cart {
     @Column(name = "total_price", nullable = false, precision = 7, scale = 2)
     private BigDecimal totalPrice;
 
-    public CartDto toDto() {
-        return CartDto.builder()
-                .userId(this.user.getId())
-                .totalPrice(this.totalPrice)
-                .build();
-    }
+
 }

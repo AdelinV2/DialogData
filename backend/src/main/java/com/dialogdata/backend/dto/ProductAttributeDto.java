@@ -15,6 +15,8 @@ import java.io.Serializable;
 @Builder
 public class ProductAttributeDto implements Serializable {
 
+    Integer id;
+
     @NotNull
     @Size(max = 50)
     String name;
@@ -23,10 +25,4 @@ public class ProductAttributeDto implements Serializable {
     @Size(max = 255)
     String value;
 
-    public ProductAttribute toEntity() {
-        return ProductAttribute.builder()
-                .name(this.name)
-                .value(this.value)
-                .build();
-    }
 }

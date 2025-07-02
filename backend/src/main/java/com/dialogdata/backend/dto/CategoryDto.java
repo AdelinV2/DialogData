@@ -1,6 +1,7 @@
 package com.dialogdata.backend.dto;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Value;
 
@@ -11,6 +12,8 @@ import java.io.Serializable;
  */
 @Value
 public class CategoryDto implements Serializable {
+
+    Integer id;
 
     @Size(max = 50)
     @NotEmpty

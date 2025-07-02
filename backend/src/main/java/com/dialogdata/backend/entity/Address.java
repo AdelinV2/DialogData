@@ -45,13 +45,4 @@ public class Address {
     @Column(name = "country", nullable = false, length = 50)
     private String country;
 
-    public AddressDto toDto() {
-        return AddressDto.builder()
-                .streetLine(this.streetLine)
-                .postalCode(this.postalCode)
-                .city(this.city)
-                .county(this.county)
-                .country(this.country)
-                .build();
-    }
 }

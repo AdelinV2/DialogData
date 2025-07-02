@@ -23,7 +23,6 @@ import java.time.LocalDate;
 public class Product {
 
     @Id
-    @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -46,7 +45,7 @@ public class Product {
     private Integer availableQuantity;
 
     @NotNull
-    @ColumnDefault("CURRENT_TIMESTAMP")
+    @ColumnDefault("CURRENT_DATE")
     @Column(name = "added_date", nullable = false)
     private LocalDate addedDate;
 }

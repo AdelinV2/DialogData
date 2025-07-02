@@ -1,5 +1,6 @@
 package com.dialogdata.backend.dto;
 
+import com.dialogdata.backend.entity.Category;
 import com.dialogdata.backend.entity.Product;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -19,6 +20,8 @@ import java.util.List;
 @Builder
 public class ProductDto implements Serializable {
 
+    Integer id;
+
     @Size(max = 50)
     @NotEmpty
     String name;
@@ -37,15 +40,5 @@ public class ProductDto implements Serializable {
 
     List<ProductAttributeDto> attributes;
 
-    Integer categoryId;
-
-    public Product toEntity() {
-        return Product.builder()
-                .name(this.name)
-                .description(this.description)
-                .price(this.price)
-                .availableQuantity(this.availableQuantity)
-                .addedDate(this.addedDate)
-                .build();
-    }
+    Category category;
 }

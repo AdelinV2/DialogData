@@ -21,16 +21,14 @@ public class User {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Size(max = 50)
     @NotEmpty
     @Column(name = "first_name", nullable = false, length = 50)
-    @Max(value = 50, message = "First name must not exceed 50 characters")
+    @Size(max = 50, message = "First name must not exceed 50 characters")
     private String firstName;
 
-    @Size(max = 50)
     @NotEmpty
     @Column(name = "last_name", nullable = false, length = 50)
-    @Max(value = 50, message = "Last name must not exceed 50 characters")
+    @Size(max = 50, message = "Last name must not exceed 50 characters")
     private String lastName;
 
     @Size(max = 255)
@@ -39,38 +37,26 @@ public class User {
     @Email
     private String email;
 
-    @Size(max = 20)
     @NotEmpty
     @Column(name = "phone_number", nullable = false, length = 20)
     @Pattern(regexp = "^[0-9]+$", message = "Phone number must contain only digits")
     private String phoneNumber;
 
-    @Size(max = 50)
     @NotEmpty
-    @Column(name = "password", nullable = false, length = 50)
-    @Max(value = 50, message = "Password must not exceed 50 characters")
+    @Column(name = "password", nullable = false, length = 60)
+    @Size(max = 60, message = "Password must not exceed 60 characters")
     private String password;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "delivery_address_id", nullable = false)
     private Address deliveryAddress;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "billing_address_id", nullable = false)
     private Address billingAddress;
 
-    public UserDto toDto() {
-        return UserDto.builder()
-                .firstName(this.firstName)
-                .lastName(this.lastName)
-                .email(this.email)
-                .phoneNumber(this.phoneNumber)
-                .deliveryAddress(this.deliveryAddress.toDto())
-                .billingAddress(this.billingAddress.toDto())
-                .build();
-    }
 }

@@ -17,6 +17,8 @@ import java.math.BigDecimal;
 @Data
 public class CartDto implements Serializable {
 
+    Integer id;
+
     @NotNull
     Integer userId;
 

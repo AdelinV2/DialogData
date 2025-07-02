@@ -27,6 +27,12 @@ public class CartEntry {
     private Product product;
 
     @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "cart_id", nullable = false)
+    private Cart cart;
+
+    @NotNull
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 

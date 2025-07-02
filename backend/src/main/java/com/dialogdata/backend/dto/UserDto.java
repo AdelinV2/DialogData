@@ -16,6 +16,8 @@ import java.io.Serializable;
 @Data
 public class UserDto implements Serializable {
 
+    Integer id;
+
     @Size(max = 50)
     @NotEmpty
     String firstName;
@@ -34,7 +36,7 @@ public class UserDto implements Serializable {
     @NotEmpty
     String phoneNumber;
 
-    @Size(max = 50)
+    @Size(max = 60)
     @NotEmpty
     String password;
 
@@ -44,15 +46,4 @@ public class UserDto implements Serializable {
     @NotNull
     AddressDto billingAddress;
 
-    public User toEntity() {
-        return User.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .phoneNumber(phoneNumber)
-                .password(password)
-                .deliveryAddress(deliveryAddress.toEntity())
-                .billingAddress(billingAddress.toEntity())
-                .build();
-    }
 }

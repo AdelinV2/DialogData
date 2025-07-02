@@ -2,6 +2,7 @@ package com.dialogdata.backend.dto;
 
 import com.dialogdata.backend.entity.Address;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,8 @@ import java.io.Serializable;
 @Builder
 @Data
 public class AddressDto implements Serializable {
+    
+    Integer id;
 
     @Size(max = 100)
     @NotEmpty
@@ -37,13 +40,5 @@ public class AddressDto implements Serializable {
     @NotEmpty
     String country;
 
-    public Address toEntity() {
-        return Address.builder()
-                .streetLine(streetLine)
-                .postalCode(postalCode)
-                .city(city)
-                .county(county)
-                .country(country)
-                .build();
-    }
+
 }

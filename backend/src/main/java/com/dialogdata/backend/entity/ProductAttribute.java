@@ -30,10 +30,5 @@ public class ProductAttribute {
     @Column(name = "value", nullable = false)
     private String value;
 
-    public ProductAttributeDto toDto() {
-        return ProductAttributeDto.builder()
-                .name(this.name)
-                .value(this.value)
-                .build();
-    }
+
 }
