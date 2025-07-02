@@ -1,5 +1,6 @@
 package com.dialogdata.backend.entity;
 
+import com.dialogdata.backend.util.PaymentType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -27,13 +28,12 @@ public class Order {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cart_id", nullable = false)
-    private Address cart;
+    private Cart cart;
 
-
-    // TODO add enum for payment type
     @NotNull
     @Column(name = "payment_type", nullable = false)
-    private Integer paymentType;
+    @Enumerated(EnumType.ORDINAL)
+    private PaymentType paymentType;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

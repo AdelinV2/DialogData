@@ -5,7 +5,6 @@ import com.dialogdata.backend.dto.CartEntryDto;
 import com.dialogdata.backend.entity.Cart;
 import com.dialogdata.backend.entity.CartEntry;
 import com.dialogdata.backend.mapper.CartEntryMapper;
-import com.dialogdata.backend.mapper.CartMapper;
 import com.dialogdata.backend.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 public class CartController {
 
     private final CartService cartService;
-    private final CartMapper cartMapper;
     private final CartEntryMapper cartEntryMapper;
 
     @Operation(summary = "Get cart by current user ID")
@@ -31,13 +29,13 @@ public class CartController {
     public ResponseEntity<CartDto> getCartByCurrentUserId(@Parameter(description = "ID of the current user", required = true)
                                                           @PathVariable("userId") Integer userId) {
 
-        Cart cart = cartService.findByUserId(userId);
+        CartDto cart = cartService.findCartDtoByUserId(userId);
 
         if (cart == null) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(cartMapper.toDto(cart));
+        return ResponseEntity.ok(cart);
     }
 
     @Operation(summary = "Add product to cart")
@@ -49,7 +47,7 @@ public class CartController {
                                                          @Parameter(description = "ID of the user", required = true)
                                                          @PathVariable("userId") Integer userId) {
 
-        CartEntry cartEntry = cartService.addProductToCart(cartEntryMapper.toEntity(cartEntryDto), userId);
+        CartEntry cartEntry = cartService.addProductToCart(cartEntryDto, userId);
 
         if (cartEntry == null) {
             return ResponseEntity.badRequest().build();
@@ -70,7 +68,7 @@ public class CartController {
 
         Cart cart = cartService.removeProductFromCart(productId, userId);
 
-        return null;
+        return ResponseEntity.ok(cart);
     }
 
     @Operation(summary = "Update product quantity in cart")
@@ -87,6 +85,6 @@ public class CartController {
 
         Cart cart = cartService.updateProductQuantityInCart(userId, productId, quantity);
 
-        return null;
+        return ResponseEntity.ok(cart);
     }
 }

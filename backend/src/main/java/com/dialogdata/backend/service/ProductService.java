@@ -1,6 +1,12 @@
 package com.dialogdata.backend.service;
 
+import com.dialogdata.backend.dto.CategoryDto;
+import com.dialogdata.backend.dto.ProductDto;
 import com.dialogdata.backend.entity.Product;
+import com.dialogdata.backend.entity.ProductAttribute;
+import com.dialogdata.backend.mapper.CategoryMapper;
+import com.dialogdata.backend.mapper.ProductAttributeMapper;
+import com.dialogdata.backend.mapper.ProductMapper;
 import com.dialogdata.backend.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -15,16 +21,52 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryProductListService categoryProductListService;
+    private final CategoryService categoryService;
+    private final ProductAttributeListService productAttributeListService;
+    private final ProductAttributeService productAttributeService;
+    private final ProductMapper productMapper;
+    private final CategoryMapper categoryMapper;
+    private final ProductAttributeMapper productAttributeMapper;
 
-    public Product findById(Integer id) {
+    public ProductDto findProductDtoById(Integer id) {
 
+        Product product = productRepository.findById(id).orElse(null);
+
+        if (product == null) {
+            return null;
+        }
+
+        List<ProductAttribute> attributes = productAttributeListService.findByProductId(id);
+        CategoryDto category = categoryMapper.toDto(categoryService.findCategoryByProductId(id));
+
+        ProductDto productDto = productMapper.toDto(product);
+        productDto.setAttributes(productAttributeMapper.toDtoList(attributes));
+        productDto.setCategory(category);
+
+        return productDto;
+    }
+
+    public Product findProductById(Integer id) {
         return productRepository.findById(id).orElse(null);
     }
 
     @Transactional
-    public Product createProduct(Product product) {
+    public ProductDto createProduct(ProductDto productDto) {
 
-        return productRepository.save(product);
+        Product createdProduct = productRepository.save(productMapper.toEntity(productDto));
+
+        categoryProductListService.createCategoryProductList(categoryMapper.toEntity(productDto.getCategory()), createdProduct);
+        for (ProductAttribute attribute : productAttributeMapper.toEntityList(productDto.getAttributes())) {
+            ProductAttribute savedAttribute = productAttributeService.create(attribute);
+            productAttributeListService.create(savedAttribute, createdProduct);
+        }
+
+        ProductDto createdProductDto = productMapper.toDto(createdProduct);
+        createdProductDto.setCategory(categoryMapper.toDto(categoryService.findCategoryByProductId(createdProduct.getId())));
+        createdProductDto.setAttributes(productAttributeMapper.toDtoList(productAttributeListService.findByProductId(createdProduct.getId())));
+
+        return createdProductDto;
     }
 
     public Page<Product> getProducts(Pageable pageable) {

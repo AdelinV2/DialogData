@@ -1,6 +1,5 @@
 package com.dialogdata.backend.dto;
 
-import com.dialogdata.backend.entity.User;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;

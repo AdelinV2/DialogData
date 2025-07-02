@@ -2,11 +2,7 @@ package com.dialogdata.backend.controller;
 
 import com.dialogdata.backend.dto.ProductDto;
 import com.dialogdata.backend.entity.Product;
-import com.dialogdata.backend.entity.ProductAttribute;
-import com.dialogdata.backend.mapper.ProductAttributeMapper;
 import com.dialogdata.backend.mapper.ProductMapper;
-import com.dialogdata.backend.service.CategoryProductListService;
-import com.dialogdata.backend.service.ProductAttributeListService;
 import com.dialogdata.backend.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
 
     private final ProductService productService;
-    private final CategoryProductListService categoryProductListService;
-    private final ProductAttributeListService productAttributeListService;
     private final ProductMapper productMapper;
-    private final ProductAttributeMapper productAttributeMapper;
 
     @Operation(summary = "Get a product by ID")
     @ApiResponse(responseCode = "200", description = "Product found")
@@ -36,13 +29,13 @@ public class ProductController {
     public ResponseEntity<ProductDto> getProductById(@Parameter(description = "ID of the product", required = true)
                                                      @PathVariable("id") Integer id) {
 
-        Product product = productService.findById(id);
+        ProductDto product = productService.findProductDtoById(id);
 
         if (product == null) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(productMapper.toDto(product));
+        return ResponseEntity.ok(product);
     }
 
     @Operation(summary = "Create a new product")
@@ -52,18 +45,7 @@ public class ProductController {
     public ResponseEntity<ProductDto> createProduct(@Parameter(description = "Product to create", required = true)
                                                     @RequestBody @Valid ProductDto product) {
 
-        Product createdProduct = productService.createProduct(productMapper.toEntity(product));
-
-        if (createdProduct == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        categoryProductListService.createCategoryProductList(product.getCategory(), createdProduct);
-        for (ProductAttribute attribute : productAttributeMapper.toEntityList(product.getAttributes())) {
-            productAttributeListService.create(attribute, createdProduct);
-        }
-
-        return ResponseEntity.status(201).body(productMapper.toDto(createdProduct));
+        return ResponseEntity.status(201).body(productService.createProduct(product));
     }
 
     @Operation(summary = "Get all products with pagination")

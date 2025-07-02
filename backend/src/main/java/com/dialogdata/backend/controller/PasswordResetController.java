@@ -35,10 +35,10 @@ public class PasswordResetController {
     @Operation(summary = "Reset password")
     @ApiResponse(responseCode = "200", description = "Password reset successfully")
     @ApiResponse(responseCode = "400", description = "Invalid password or token")
-    @PostMapping
+    @PostMapping("/{token}")
     public ResponseEntity<Void> resetPassword(
             @Parameter(description = "Password reset token", required = true)
-            @RequestAttribute("token") String token,
+            @PathVariable("token") String token,
             @Parameter(description = "New password", required = true)
             @RequestParam("newPassword") String newPassword) {
 

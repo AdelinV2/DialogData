@@ -7,6 +7,8 @@ import com.dialogdata.backend.repository.ProductAttributeListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProductAttributeListService {
@@ -49,5 +51,9 @@ public class ProductAttributeListService {
 
         productAttributeListRepository.delete(productAttributeList);
         return true;
+    }
+
+    public List<ProductAttribute> findByProductId(Integer id) {
+        return productAttributeListRepository.findAllByProductId(id);
     }
 }

@@ -26,7 +26,7 @@ public class UserController {
     @ApiResponse(responseCode = "404", description = "User not found")
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserId(@Parameter(description = "ID of the user", required = true)
-                                          @PathVariable("id") Integer id) {
+                                             @PathVariable("id") Integer id) {
 
         User user = userService.getUserById(id);
 
@@ -62,9 +62,9 @@ public class UserController {
     @ApiResponse(responseCode = "404", description = "User not found")
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@Parameter(description = "ID of the user to be updated", required = true)
-                                           @PathVariable("id") Integer id,
-                                           @Parameter(description = "Updated user object", required = true)
-                                           @RequestBody @Valid UserDto user) {
+                                              @PathVariable("id") Integer id,
+                                              @Parameter(description = "Updated user object", required = true)
+                                              @RequestBody @Valid UserDto user) {
 
         User updatedUser = userService.updateUser(id, userMapper.toEntity(user));
 
@@ -98,7 +98,7 @@ public class UserController {
     @ApiResponse(responseCode = "401", description = "Invalid email or password")
     @PostMapping("/login")
     public ResponseEntity<UserDto> authenticateUser(@Parameter(description = "User login credentials", required = true)
-                                                 @RequestBody @Valid LoginDto loginDto) {
+                                                    @RequestBody @Valid LoginDto loginDto) {
 
         User user = userService.authenticateUser(loginDto);
 

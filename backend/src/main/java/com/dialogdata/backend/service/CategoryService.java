@@ -49,4 +49,8 @@ public class CategoryService {
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
+
+    public Category findCategoryByProductId(Integer id) {
+        return categoryRepository.findCategoryByProductId(id);
+    }
 }

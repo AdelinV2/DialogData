@@ -10,7 +10,10 @@ import java.util.List;
 public interface ProductAttributeMapper {
 
     ProductAttribute toEntity(ProductAttributeDto productAttributeDto);
+
     ProductAttributeDto toDto(ProductAttribute productAttribute);
+
     List<ProductAttribute> toEntityList(List<ProductAttributeDto> productAttributeDtos);
+
     List<ProductAttributeDto> toDtoList(List<ProductAttribute> productAttributes);
 }

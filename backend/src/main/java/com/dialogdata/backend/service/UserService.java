@@ -44,6 +44,12 @@ public class UserService {
             return null;
         }
 
+        if (user.getPassword().equals("null")) {
+            user.setPassword(existingUser.getPassword());
+        } else {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
         user.setId(id);
 
         return userRepository.save(user);

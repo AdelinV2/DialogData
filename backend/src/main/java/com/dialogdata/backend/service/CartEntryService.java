@@ -5,14 +5,16 @@ import com.dialogdata.backend.repository.CartEntryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CartEntryService {
 
     private final CartEntryRepository cartEntryRepository;
 
-    public void create(CartEntry cartEntry) {
-        cartEntryRepository.save(cartEntry);
+    public CartEntry create(CartEntry cartEntry) {
+        return cartEntryRepository.save(cartEntry);
     }
 
     public CartEntry findById(Integer id) {
@@ -61,4 +63,9 @@ public class CartEntryService {
 
         return true;
     }
+
+    public List<CartEntry> findAllByCartId(Integer id) {
+        return cartEntryRepository.findAllByCartId(id);
+    }
+
 }

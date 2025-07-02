@@ -24,7 +24,7 @@ public class Cart {
     private Integer id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -33,5 +33,7 @@ public class Cart {
     @Column(name = "total_price", nullable = false, precision = 7, scale = 2)
     private BigDecimal totalPrice;
 
-
+    @NotNull
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
 }
