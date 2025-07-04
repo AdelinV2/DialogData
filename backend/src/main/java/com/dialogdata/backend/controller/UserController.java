@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -35,6 +35,23 @@ public class UserController {
         }
 
         return ResponseEntity.ok(userMapper.toDto(user));
+    }
+
+    @Operation(summary = "Verify if a user exists by email")
+    @ApiResponse(responseCode = "200", description = "User exists")
+    @ApiResponse(responseCode = "404", description = "User not found")
+    @GetMapping("/exists/{email}")
+    public ResponseEntity<Void> userExists(@Parameter(description = "Email of the user to check", required = true)
+                                           @PathVariable("email") String email) {
+
+        boolean exists = userService.existsByEmail(email);
+        System.out.println(email + " " + exists);
+
+        if (!exists) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Create a new user", description = "Creates a new user")

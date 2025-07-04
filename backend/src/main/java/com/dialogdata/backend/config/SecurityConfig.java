@@ -30,6 +30,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 );
+
+        // add cors
+
+        http.cors(cors -> cors
+                .configurationSource(request -> {
+                    var source = new org.springframework.web.cors.CorsConfiguration();
+                    source.addAllowedOrigin("*");
+                    source.addAllowedMethod("*");
+                    source.addAllowedHeader("*");
+                    return source;
+                })
+        );
+
         return http.build();
     }
 

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/password-reset")
+@RequestMapping("/api/password-reset")
 public class PasswordResetController {
 
     private final PasswordResetService passwordResetService;
