@@ -30,6 +30,11 @@ const menuItems = [
             label: 'Login',
             icon: 'pi pi-sign-in',
             command: () => navigateTo('/login')
+          },
+          {
+            label: 'Register',
+            icon: 'pi pi-user-plus',
+            command: () => navigateTo('/register')
           }
         ]
   },
@@ -47,14 +52,14 @@ const menuItems = [
 <template>
   <Toolbar>
     <template #start>
-      <img src="/favicon.ico" alt="Logo" style="height: 40px"/>
+      <img src="/favicon.ico" alt="Logo" @click="navigateTo('/')"  style="height: 40px; cursor: pointer;"/>
     </template>
     <template #center>
       <IconField>
         <InputIcon>
           <i class="pi pi-search" />
         </InputIcon>
-        <InputText v-model="search" placeholder="Search..." class="rounded-pill" style=""/>
+        <InputText v-model="search" placeholder="Search..." class="rounded-pill md:w-96 lg:w-lg" style=""/>
       </IconField>
     </template>
     <template #end>

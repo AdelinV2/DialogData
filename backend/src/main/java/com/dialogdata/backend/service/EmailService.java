@@ -35,7 +35,7 @@ public class EmailService {
 
         PasswordReset passwordReset = passwordResetService.create(email);
 
-        String resetLink = "http://localhost:8080/password-reset/" + passwordReset.getToken();
+        String resetLink = "http://localhost:3000/password-reset/" + passwordReset.getToken();
 
         String subject = "Password Reset Request";
         String body = "To reset your password, please click the following link:\n" + resetLink;

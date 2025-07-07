@@ -21,7 +21,7 @@ public class OrderDto implements Serializable {
     Integer userId;
 
     @NotNull
-    AddressDto cart;
+    CartDto cart;
 
     @NotNull
     PaymentType paymentType;
@@ -30,7 +30,7 @@ public class OrderDto implements Serializable {
     AddressDto deliveryAddress;
 
     @NotNull
-    AddressDto invoiceAddressId;
+    AddressDto invoiceAddress;
 
     @NotNull
     BigDecimal totalPrice;

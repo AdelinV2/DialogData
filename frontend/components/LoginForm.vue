@@ -2,18 +2,23 @@
 import {ref} from 'vue';
 import {useUserStorage} from "~/composables/useUserStorage";
 import {navigateTo} from "#app";
+import PasswordResetForm from "~/components/PasswordResetForm.vue";
 
 const loginForm = ref({
   email: '',
   password: '',
 })
 
+const showForgotPassword = ref(false);
+
 const failed = ref(false);
-const { saveUser } = useUserStorage();
+const {saveUser} = useUserStorage();
+
+const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 
 const onSubmit = () => {
 
-  $fetch('http://localhost:8080/api/user/login', {
+  $fetch(apiBaseUrl + '/user/login', {
         method: 'POST',
         body: loginForm.value,
         onResponse({response}) {
@@ -46,14 +51,24 @@ const onSubmit = () => {
       <template #content>
         <Form v-slot="$form" @submit="onSubmit" class="flex justify-center flex-col gap-6 mt-5">
           <div class="flex flex-col gap-1">
-            <InputText name="email" type="email" placeholder="Email" v-model="loginForm.email"/>
+            <InputGroup>
+              <InputGroupAddon slot="prepend">
+                <i class="pi pi-envelope"/>
+              </InputGroupAddon>
+              <InputText name="email" type="email" placeholder="Email" v-model="loginForm.email"/>
+            </InputGroup>
             <Message v-if="$form.email?.invalid" severity="error" size="small" variant="simple">
               {{ $form.email.error?.message }}
             </Message>
           </div>
           <div class="flex flex-col gap-1">
-            <Password name="password" type="password" placeholder="Password" v-model="loginForm.password" fluid
-                      toggle-mask :feedback="false"/>
+            <InputGroup>
+              <InputGroupAddon slot="prepend">
+                <i class="pi pi-lock"/>
+              </InputGroupAddon>
+              <Password name="password" type="password" placeholder="Password" v-model="loginForm.password" fluid
+                        toggle-mask :feedback="false"/>
+            </InputGroup>
             <Message v-if="$form.password?.invalid" severity="error" size="small" variant="simple">
               {{ $form.password.error?.message }}
             </Message>
@@ -61,9 +76,21 @@ const onSubmit = () => {
           <Message v-if="failed" severity="error" size="small" variant="simple">
             Invalid email or password.
           </Message>
+
           <Button type="submit" severity="secondary" label="Submit"
                   :disabled="!loginForm.email || !loginForm.password"/>
         </Form>
+        <div class="text-center mt-1">
+          <a href="#" @click.prevent="showForgotPassword = true" class="text-sm text-blue-600 hover:underline">
+            Forgot Password?
+          </a>
+        </div>
+        <PasswordResetForm v-model:visible="showForgotPassword" @close="showForgotPassword = false"/>
+        <div class="text-center mt-1">
+          <a href="/register" class="text-sm text-blue-600 hover:underline mt-4">
+            Don't have an account? Register
+          </a>
+        </div>
       </template>
     </Card>
   </div>

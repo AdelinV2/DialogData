@@ -59,12 +59,12 @@ public class CartController {
     @Operation(summary = "Remove product from cart")
     @ApiResponse(responseCode = "200", description = "Product removed from cart")
     @ApiResponse(responseCode = "404", description = "Product not found in cart")
-    @PostMapping("/remove/{productId}")
+    @DeleteMapping("/remove")
     public ResponseEntity<Cart> removeProductFromCart(@Parameter(description = "ID of the product to remove", required = true)
-                                                      @PathVariable("productId")
+                                                      @RequestParam("productId")
                                                       Integer productId,
                                                       @Parameter(description = "ID of) the user", required = true)
-                                                      @RequestBody Integer userId) {
+                                                      @RequestParam("userId") Integer userId) {
 
         Cart cart = cartService.removeProductFromCart(productId, userId);
 
@@ -74,14 +74,14 @@ public class CartController {
     @Operation(summary = "Update product quantity in cart")
     @ApiResponse(responseCode = "200", description = "Product quantity updated in cart")
     @ApiResponse(responseCode = "404", description = "Product not found in cart")
-    @PutMapping("/update/{productId}")
+    @PutMapping("/update")
     public ResponseEntity<Cart> updateProductQuantityInCart(
             @Parameter(description = "ID of the product to update", required = true)
-            @PathVariable("productId") Integer productId,
+            @RequestParam("productId") Integer productId,
             @Parameter(description = "New quantity for the product", required = true)
             @RequestParam("quantity") Integer quantity,
             @Parameter(description = "ID of the user", required = true)
-            @RequestBody Integer userId) {
+            @RequestParam("userId") Integer userId) {
 
         Cart cart = cartService.updateProductQuantityInCart(userId, productId, quantity);
 

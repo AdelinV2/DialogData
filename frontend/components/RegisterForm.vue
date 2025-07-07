@@ -41,13 +41,15 @@ const sameAddress = ref(false);
 
 const { saveUser } = useUserStorage();
 
+const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
+
 const onFirstSubmit = async () => {
 
   firstRegisterForm.value.emailAlreadyExists = false;
   firstRegisterForm.value.passwordMismatch = false;
   firstRegisterForm.value.weakPassword = false;
 
-  await $fetch(`http://localhost:8080/api/user/exists/${firstRegisterForm.value.email}`, {
+  await $fetch(`${apiBaseUrl}/user/exists/${firstRegisterForm.value.email}`, {
     method: 'GET',
     onResponse({response}) {
       if (response.status === 200) {
@@ -91,7 +93,7 @@ const onSecondSubmit = () => {
     user.value.billingAddress = {...user.value.deliveryAddress};
   }
 
-  $fetch('http://localhost:8080/api/user', {
+  $fetch(`${apiBaseUrl}/user`, {
     method: 'POST',
     body: user.value,
     onResponse({response}) {

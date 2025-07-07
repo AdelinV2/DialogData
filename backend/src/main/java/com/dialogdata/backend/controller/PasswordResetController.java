@@ -1,5 +1,6 @@
 package com.dialogdata.backend.controller;
 
+import com.dialogdata.backend.dto.UserDto;
 import com.dialogdata.backend.service.EmailService;
 import com.dialogdata.backend.service.PasswordResetService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,12 +22,14 @@ public class PasswordResetController {
     @ApiResponse(responseCode = "200", description = "Token is valid")
     @ApiResponse(responseCode = "400", description = "Invalid token")
     @GetMapping("/{token}")
-    public ResponseEntity<Void> verifyToken(@Parameter(description = "Password reset token", required = true)
+    public ResponseEntity<UserDto> verifyToken(@Parameter(description = "Password reset token", required = true)
                                             @PathVariable("token") String token) {
         boolean isValid = passwordResetService.verifyToken(token);
 
+
         if (isValid) {
-            return ResponseEntity.ok().build();
+            UserDto userDto = passwordResetService.getUserByToken(token);
+            return ResponseEntity.ok(userDto);
         } else {
             return ResponseEntity.badRequest().build();
         }
@@ -40,7 +43,7 @@ public class PasswordResetController {
             @Parameter(description = "Password reset token", required = true)
             @PathVariable("token") String token,
             @Parameter(description = "New password", required = true)
-            @RequestParam("newPassword") String newPassword) {
+            @RequestBody String newPassword) {
 
         boolean isReset = passwordResetService.resetPassword(token, newPassword);
 

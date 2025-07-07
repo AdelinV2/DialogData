@@ -1,6 +1,8 @@
 package com.dialogdata.backend.service;
 
+import com.dialogdata.backend.dto.UserDto;
 import com.dialogdata.backend.entity.PasswordReset;
+import com.dialogdata.backend.mapper.UserMapper;
 import com.dialogdata.backend.repository.PasswordResetRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ public class PasswordResetService {
 
     private final PasswordResetRepository passwordResetRepository;
     private final UserService userService;
+    private final UserMapper userMapper;
 
     @Scheduled(cron = "0 0 * * * *")
     public void deleteExpiredPasswordResets() {
@@ -45,11 +48,7 @@ public class PasswordResetService {
 
         PasswordReset passwordReset = passwordResetRepository.findByToken(token);
 
-        if (passwordReset == null || passwordReset.getExpiryDate().isBefore(Instant.now())) {
-            return false;
-        }
-
-        return true;
+        return passwordReset != null && !passwordReset.getExpiryDate().isBefore(Instant.now());
     }
 
     @Transactional
@@ -79,10 +78,17 @@ public class PasswordResetService {
             return null;
         }
 
-        if (!userService.existsByEmail(email)) {
-            return false;
+        return userService.existsByEmail(email);
+    }
+
+    public UserDto getUserByToken(String token) {
+
+        PasswordReset passwordReset = passwordResetRepository.findByToken(token);
+
+        if (passwordReset == null || passwordReset.getExpiryDate().isBefore(Instant.now())) {
+            return null;
         }
 
-        return true;
+        return userMapper.toDto(userService.getUserByEmail(passwordReset.getUserEmail()));
     }
 }

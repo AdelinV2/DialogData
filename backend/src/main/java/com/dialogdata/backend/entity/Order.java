@@ -43,7 +43,7 @@ public class Order {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "invoice_address_id", nullable = false)
-    private Address invoiceAddressId;
+    private Address invoiceAddress;
 
     @NotNull
     @Column(name = "total_price", nullable = false, precision = 7, scale = 2)

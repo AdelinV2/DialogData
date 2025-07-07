@@ -1,9 +1,12 @@
 package com.dialogdata.backend.service;
 
 import com.dialogdata.backend.dto.LoginDto;
+import com.dialogdata.backend.dto.UserDto;
 import com.dialogdata.backend.entity.User;
 import com.dialogdata.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -91,5 +94,9 @@ public class UserService {
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    public User getUserByEmail(String userEmail) {
+        return userRepository.findByEmail(userEmail);
     }
 }

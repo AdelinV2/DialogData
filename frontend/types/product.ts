@@ -9,5 +9,6 @@ export interface Product {
     availableQuantity: number,
     addedDate: Date,
     attributes: Attribute[],
-    category: Category
+    category: Category,
+    imageUrl?: string,
 }
