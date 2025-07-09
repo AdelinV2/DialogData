@@ -23,8 +23,8 @@ public class ImageController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/get/{productId}")
-    public ResponseEntity<List<String>> getProductImages(@PathVariable String productId) throws Exception {
+    @GetMapping("/get/{productId}")
+    public ResponseEntity<List<String>> getProductImages(@PathVariable("productId") Integer productId) throws Exception {
 
         List<String> images = imageService.getProductImages(productId);
 

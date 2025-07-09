@@ -2,8 +2,7 @@ package com.dialogdata.main.dto;
 
 import com.dialogdata.main.entity.CartEntry;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.Value;
+import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -11,8 +10,10 @@ import java.math.BigDecimal;
 /**
  * DTO for {@link CartEntry}
  */
-@Value
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class CartEntryDto implements Serializable {
 
     Integer id;

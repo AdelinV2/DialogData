@@ -7,6 +7,13 @@ const products = ref<Product[]>([])
 const pageInfo = ref({ page: 0, size: 10, totalElements: 0, totalPages: 0 })
 const sort = ref({ by: 'addedDate', order: 'desc' })
 
+const sortOptions = [
+  { label: 'Newest First', value: { by: 'addedDate', order: 'desc' } },
+  { label: 'Oldest First', value: { by: 'addedDate', order: 'asc' } },
+  { label: 'Price High to Low', value: { by: 'price', order: 'desc' } },
+  { label: 'Price Low to High', value: { by: 'price', order: 'asc' } }
+]
+
 const selectedCategory = ref<number | null>(null)
 const searchTerm = ref('')
 
@@ -52,6 +59,11 @@ watch(
   { immediate: true }
 )
 
+const onSortChange = (newSort: { by: string, order: string }) => {
+  sort.value = newSort;
+  pageInfo.value.page = 0;
+}
+
 const onPageChange = (event: any) => {
   pageInfo.value.page = event.page
   pageInfo.value.size = event.rows
@@ -80,8 +92,8 @@ onMounted(() => {
     <div class="flex-none me-10">
       <ProductCategories @category-selected="onCategorySelected" />
     </div>
-    <div class="flex-auto">
-      <ProductList :products="products" />
+    <div class="flex-auto me-5">
+      <ProductList :products="products" :sort="sort" :sortOptions="sortOptions" @sort-change="onSortChange" />
     </div>
   </div>
 
@@ -94,4 +106,9 @@ onMounted(() => {
       @page="onPageChange"
     />
   </div>
+  <Footer />
 </template>
+
+<style scoped>
+
+</style>

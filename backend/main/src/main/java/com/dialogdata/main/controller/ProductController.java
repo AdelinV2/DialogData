@@ -88,7 +88,11 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
 
-        Page<ProductDto> productDtos = products.map(productMapper::toDto);
+        Page<ProductDto> productDtos = products.map(product -> {
+            ProductDto dto = productMapper.toDto(product);
+            dto.setImages(productService.getProductImagesByProductId(product.getId()));
+            return dto;
+        });
 
         return ResponseEntity.ok(productDtos);
     }

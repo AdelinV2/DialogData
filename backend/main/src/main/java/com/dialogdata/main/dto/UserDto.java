@@ -2,18 +2,17 @@ package com.dialogdata.main.dto;
 
 import com.dialogdata.main.entity.User;
 import jakarta.validation.constraints.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Value;
+import lombok.*;
 
 import java.io.Serializable;
 
 /**
  * DTO for {@link User}
  */
-@Value
-@Builder
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDto implements Serializable {
 
     Integer id;

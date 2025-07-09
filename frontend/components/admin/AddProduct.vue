@@ -3,20 +3,21 @@
 import type {Attribute} from "~/types/attribute";
 import type {Category} from "~/types/category";
 import type {Product} from "~/types/product";
+import type {Image} from "~/types/image";
 
 
 const product = ref<Product>({
   name: '',
   description: '',
-  price: 0,
+  price: 0.0,
   availableQuantity: 0,
   addedDate: new Date(),
   attributes: [] as Attribute[],
   category: {} as Category,
-  imageUrls: [],
-  imageFile: [],
+  images: [] as Image[],
 })
 
+const toast = useToast();
 const categories = ref<Category[]>([])
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 
@@ -24,17 +25,16 @@ function handleImageChange(event: Event) {
   const target = event.target as HTMLInputElement | null;
   if (!target || !target.files) return;
   const files = Array.from(target.files);
-  product.value.imageFile = [];
-  product.value.imageUrls = [];
+  product.value.images = [];
 
   files.forEach((file, index) => {
     const reader = new FileReader();
     reader.onload = () => {
-      product.value.imageFile?.push({
+      product.value.images.push({
         base64: reader.result as string,
-        fileName: `${index}`,
+        fileName: index.toString(),
+        imageUrl: '',
       });
-      product.value.imageUrls?.push(reader.result as string);
     };
     reader.readAsDataURL(file);
   });
@@ -47,23 +47,82 @@ $fetch(`${apiBaseUrl}/category`, {
       categories.value = response._data as Category[];
       console.log('Categories fetched successfully:', categories.value);
     } else {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to fetch categories',
+        life: 3000,
+      });
       console.error('Failed to fetch categories');
     }
   },
-}).then((data) => {
-  console.log(data);
 }).catch((error) => {
+  toast.add({
+    severity: 'error',
+    summary: 'Error',
+    detail: 'Error fetching categories',
+    life: 3000,
+  });
   console.error('Error fetching categories:', error);
 });
 
 function onSubmit() {
+  $fetch(`${apiBaseUrl}/products`, {
+    method: 'POST',
+    body: product.value,
+    onResponse({response}) {
+      if (response.status === 201) {
+        console.log('Product added successfully:', response._data);
+        toast.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Product added successfully',
+          life: 3000,
+        });
+        product.value = {
+          name: '',
+          description: '',
+          price: 0,
+          availableQuantity: 0,
+          addedDate: new Date(),
+          attributes: [] as Attribute[],
+          category: {} as Category,
+          images: [] as Image[],
+        };
+      } else {
+        console.error('Failed to add product');
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to add product',
+          life: 3000,
+        });
+      }
+    },
+  }).catch((error) => {
+    console.error('Error adding product:', error);
+  });
+}
 
+function addAttribute() {
+  const newName = '';
+  if (product.value.attributes.some(attr => attr.name === newName)) {
+    toast.add({
+      severity: 'error',
+      summary: 'Duplicate Attribute',
+      detail: 'Attribute names must be unique.',
+      life: 3000,
+    });
+    return;
+  }
+  product.value.attributes.push({ name: newName, value: '' });
 }
 
 </script>
 
 <template>
 
+  <Toast />
   <Card class="mt-8 mb-14" style="width: 600px; justify-self: center;">
     <template #title>
       Add Product
@@ -95,7 +154,7 @@ function onSubmit() {
             <i class="pi pi-dollar"></i>
           </InputGroupAddon>
           <FloatLabel variant="on">
-            <InputText id="price" type="number" v-model="product.price"/>
+            <InputNumber id="price" type="number" :max-fraction-digits="2" v-model="product.price"/>
             <label for="price">Price</label>
           </FloatLabel>
         </InputGroup>
@@ -105,7 +164,7 @@ function onSubmit() {
             <i class="pi pi-box"></i>
           </InputGroupAddon>
           <FloatLabel variant="on">
-            <InputText id="availableQuantity" type="number" v-model="product.availableQuantity"/>
+            <InputNumber id="availableQuantity" type="number" v-model="product.availableQuantity"/>
             <label for="availableQuantity">Available Quantity</label>
           </FloatLabel>
         </InputGroup>
@@ -115,7 +174,7 @@ function onSubmit() {
             <i class="pi pi-calendar"></i>
           </InputGroupAddon>
           <FloatLabel variant="on">
-            <InputText id="addedDate" type="date" v-model="product.addedDate"/>
+            <DatePicker id="addedDate" date-format="dd / mm / yy" type="date" v-model="product.addedDate"/>
             <label for="addedDate">Added Date</label>
           </FloatLabel>
         </InputGroup>
@@ -137,7 +196,7 @@ function onSubmit() {
             <Button icon="pi pi-trash" severity="danger" @click="product.attributes.splice(index, 1)"/>
           </div>
           <Button icon="pi pi-plus" class="w-fit self-center mb-3" label="Add Attribute"
-                  @click="product.attributes.push({ name: '', value: '' })"/>
+                  @click="addAttribute"/>
         </div>
 
         <InputGroup>
@@ -150,7 +209,6 @@ function onSubmit() {
                 v-model="product.category"
                 :options="categories"
                 optionLabel="name"
-                optionValue="id"
                 class="w-full"
             />
             <label for="category">Category</label>
@@ -173,7 +231,7 @@ function onSubmit() {
         </InputGroup>
       </div>
       <Button label="Submit" class="w-full mt-5" @click="onSubmit"
-              :disabled="!product.name || !product.description || product.price <= 0 || !product.addedDate || !product.category.id || product.attributes.length === 0 || product.imageFile?.length === 0" />
+              :disabled="!product.name || !product.description || product.price <= 0 || !product.addedDate || !product.category || product.attributes.length === 0 || product.images?.length === 0" />
     </template>
   </Card>
 

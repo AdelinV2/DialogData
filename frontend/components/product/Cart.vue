@@ -1,11 +1,10 @@
 <script setup lang="ts">
-
 import type {Product} from "~/types/product";
 import type {CartEntry} from "~/types/cartEntry";
 
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 
-const products = ref([] as Product[]);
+const products = ref({} as Record<number, Product>);
 const cartEntries = ref([] as CartEntry[]);
 const {user} = useUserStorage();
 const toast = useToast();
@@ -24,12 +23,10 @@ const fetchCart = () => {
         fetchProducts();
       }
     }
-  }).then((data) => {
-    console.log(data);
   }).catch((error) => {
     console.error('Error fetching cart:', error);
   });
-}
+};
 
 const onQuantityChange = (event: any) => {
 
@@ -54,7 +51,7 @@ const onQuantityChange = (event: any) => {
   }).catch((error) => {
     console.error('Error updating cart:', error);
   });
-}
+};
 
 const onRemoveItem = (index: number) => {
   const entry = cartEntries.value[index];
@@ -67,8 +64,7 @@ const onRemoveItem = (index: number) => {
     onResponse({response}) {
       if (response.status === 200) {
         cartEntries.value.splice(index, 1);
-        products.value.splice(index, 1);
-        console.log('Item removed from cart');
+        delete products.value[entry.productId];
         toast.add({
           severity: 'success',
           summary: 'Success',
@@ -76,7 +72,6 @@ const onRemoveItem = (index: number) => {
           life: 3000
         });
       } else {
-        console.error('Failed to remove item from cart');
         toast.add({
           severity: 'error',
           summary: 'Error',
@@ -89,16 +84,17 @@ const onRemoveItem = (index: number) => {
     console.error('Error removing item from cart:', error);
   });
 };
-const fetchProducts = () => {
 
+const fetchProducts = () => {
+  products.value = {};
   for (const entry of cartEntries.value) {
     $fetch(`${apiBaseUrl}/products/${entry.productId}`, {
       method: 'GET',
       onResponse({response}) {
         if (response.status === 200) {
           const product = response._data as Product;
-          product.availableQuantity = entry.quantity; // Set available quantity from cart entry
-          products.value.push(product);
+          products.value[entry.productId] = product;
+          console.log(`Product ${product.name} fetched successfully: `, product);
         }
       }
     }).catch((error) => {
@@ -108,7 +104,6 @@ const fetchProducts = () => {
 };
 
 const getSeverity = (product: Product) => {
-
   if (product.availableQuantity > 5) {
     return 'success';
   } else if (product.availableQuantity > 0) {
@@ -127,61 +122,63 @@ const getStockName = (product: Product) => {
     return 'Out of Stock';
   }
 };
-
 </script>
 
 <template>
-
-  <Toast  />
+  <Toast/>
   <div class="container flex flex-1 flex-row justify-betweenq mx-auto px-4 py-10">
     <div class="flex-1 min-h-0">
-      <DataView :value="products">
+      <DataView :value="cartEntries">
         <template #list="slotProps">
           <div class="flex flex-col">
-            <div v-for="(item, index) in products" :key="item.id">
+            <div v-for="(entry, index) in cartEntries" :key="entry.id">
               <div class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
                    :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }">
                 <div class="md:w-40 relative">
-                  <img class="block xl:block mx-auto rounded w-full"
-                       :src="`https://primefaces.org/cdn/primevue/images/product/${item.imageUrl}`" :alt="item.name"/>
+                  <img
+                      v-if="products[entry.productId]"
+                      class="block xl:block mx-auto rounded w-full"
+                      :src="`${products[entry.productId].images[0].imageUrl}`"
+                      :alt="products[entry.productId].name"
+                  />
                 </div>
                 <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
                   <div class="flex flex-row md:flex-col justify-between items-start gap-2">
                     <div class="relative bg-black/70 rounded-border" style="left: 4px; top: 4px">
-                      <Tag :value="getStockName(item)" :severity="getSeverity(item)"></Tag>
+                      <Tag
+                          v-if="products[entry.productId]"
+                          :value="getStockName(products[entry.productId])"
+                          :severity="getSeverity(products[entry.productId])"
+                      ></Tag>
                     </div>
                     <div>
-                      <!--                    <span class="font-medium text-surface-500 dark:text-surface-400 text-sm">{{ item.category }}</span>-->
-                      <div class="text-lg font-medium mt-2">{{ item.name }}</div>
+                      <div class="text-lg font-medium mt-2">
+                        {{ products[entry.productId]?.name || 'Product' }}
+                      </div>
                     </div>
-                    <!--                  <div class="bg-surface-100 p-1" style="border-radius: 30px">-->
-                    <!--                    <div class="bg-surface-0 flex items-center gap-2 justify-center py-1 px-2"-->
-                    <!--                         style="border-radius: 30px; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px 0px rgba(0, 0, 0, 0.06)">-->
-                    <!--                      <span class="text-surface-900 font-medium text-sm">{{ item.rating }}</span>-->
-                    <!--                      <i class="pi pi-star-fill text-yellow-500"></i>-->
-                    <!--                    </div>-->
-                    <!--                  </div>-->
                   </div>
                   <div class="flex flex-col md:items-end gap-8">
-                  <span class="text-2xl font-bold">
-                    <span>${{ Math.floor(item.price) }}</span>
-                    <span class="text-base align-middle">{{ (item.price % 1).toFixed(2).slice(1) }}</span>
-                  </span>
+                    <span class="text-2xl font-bold">
+                      <span v-if="products[entry.productId]">${{ Math.floor(products[entry.productId].price) }}</span>
+                      <span v-if="products[entry.productId]" class="text-base align-middle">
+                        {{ (products[entry.productId].price % 1).toFixed(2).slice(1) }}
+                      </span>
+                    </span>
                     <div class="flex items-center mt-2">
                       <Button
                           icon="pi pi-minus"
                           class="p-button-rounded p-button-text"
-                          @click="onQuantityChange({ index, value: Math.max(1, cartEntries[index].quantity - 1) })"
-                          :disabled="cartEntries[index].quantity <= 1"
+                          @click="onQuantityChange({ index, value: Math.max(1, entry.quantity - 1) })"
+                          :disabled="entry.quantity <= 1"
                           aria-label="Decrease quantity"
                           type="button"
                       />
-                      <span class="px-3 font-semibold text-lg">{{ cartEntries[index].quantity }}</span>
+                      <span class="px-3 font-semibold text-lg">{{ entry.quantity }}</span>
                       <Button
                           icon="pi pi-plus"
                           class="p-button-rounded p-button-text"
-                          @click="onQuantityChange({ index, value: cartEntries[index].quantity + 1 })"
-                          :disabled="item.availableQuantity <= cartEntries[index].quantity"
+                          @click="onQuantityChange({ index, value: entry.quantity + 1 })"
+                          :disabled="products[entry.productId]?.availableQuantity <= entry.quantity"
                           aria-label="Increase quantity"
                           type="button"
                       />
@@ -193,11 +190,6 @@ const getStockName = (product: Product) => {
                           type="button"
                       />
                     </div>
-                    <!--                  <div class="flex flex-row-reverse md:flex-row gap-2">-->
-                    <!--                    <Button icon="pi pi-heart" outlined></Button>-->
-                    <!--                    <Button icon="pi pi-shopping-cart" label="Buy Now" :disabled="item.availableQuantity === 0"-->
-                    <!--                            class="flex-auto md:flex-initial whitespace-nowrap"></Button>-->
-                    <!--                  </div>-->
                   </div>
                 </div>
               </div>
@@ -211,7 +203,9 @@ const getStockName = (product: Product) => {
       <template #content>
         <div class="flex flex-col gap-4">
           <div v-for="(entry, index) in cartEntries" :key="entry.id" class="flex items-center justify-between">
-            <span>{{ products[index].name }} ({{ entry.quantity }})</span>
+            <span>
+              {{ products[entry.productId]?.name || 'Product' }} <span class="font-bold"> ({{ entry.quantity }}) </span>
+            </span>
             <span>${{ (entry.pricePerPiece * entry.quantity).toFixed(2) }}</span>
           </div>
           <hr class="my-4"/>
@@ -222,21 +216,9 @@ const getStockName = (product: Product) => {
             </span>
           </div>
         </div>
-        <Button label="Checkout" class="mt-4 w-full" severity="primary" @click="() => navigateTo('/checkout')" :disabled="cartEntries.length === 0"/>
+        <Button label="Checkout" class="mt-4 w-full" severity="primary" @click="() => navigateTo('/checkout')"
+                :disabled="cartEntries.length === 0"/>
       </template>
     </Card>
   </div>
-
-
 </template>
-
-<style scoped>
-.custom-remove-btn {
-  color: #6b7280 !important;
-  border: none !important;
-}
-
-.custom-remove-btn:hover {
-  color: #374151 !important;
-}
-</style>

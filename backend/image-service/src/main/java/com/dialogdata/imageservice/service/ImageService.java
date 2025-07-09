@@ -16,7 +16,8 @@ public class ImageService {
         imageKitService.uploadProductImage(imageGetDto.getBase64(), imageGetDto.getFileName());
     }
 
-    public List<String> getProductImages(String productId) throws Exception {
+    public List<String> getProductImages(Integer productId) throws Exception {
+
         return imageKitService.getProductImages(productId);
     }
 }

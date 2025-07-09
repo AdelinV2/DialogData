@@ -52,7 +52,7 @@ const onAddToCart = () => {
   <div class="container mx-auto px-4 py-10">
     <p class="text-3xl font-semibold mb-4">{{ product.name }}</p>
     <div class="flex justify-between">
-      <img :alt="product.name" :src="product.imageUrls?.[0]" style="height: 30rem"/>
+      <img :alt="product.name" :src="product.images[0] ? (product.images[0].imageUrl || product.images[0].base64) : ''" style="height: 30rem"/>
       <div>
         <p class="text-2xl font-bold mb-4">
           <span>Price: ${{ Math.floor(product.price) }}</span>
@@ -63,7 +63,7 @@ const onAddToCart = () => {
                 icon="pi pi-shopping-cart" label="Add to Cart" @click="() => onAddToCart()"/>
       </div>
     </div>
-    <p class="text-2xl font-semibold mb-4">Description</p>
+    <p class="text-2xl font-semibold my-4">Description</p>
     <p class="text-lg mb-4">{{ product.description }}</p>
     <p class="text-2xl font-semibold my-4">Specifications</p>
     <p class="text-lg mb-1" v-for="(spec) in product.attributes" :key="spec.id">

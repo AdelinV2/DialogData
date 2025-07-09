@@ -2,20 +2,21 @@ package com.dialogdata.main.dto;
 
 import com.dialogdata.main.entity.Address;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 
 /**
  * DTO for {@link Address}
  */
-@Value
-@Builder
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AddressDto implements Serializable {
     
     Integer id;

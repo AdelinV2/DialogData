@@ -39,7 +39,5 @@ public class ProductDto implements Serializable {
 
     CategoryDto category;
 
-    List<String> images;
-
-    List<ImageDto> imageDtos;
+    List<ImageDto> images;
 }

@@ -1,5 +1,6 @@
 import type {Attribute} from "~/types/attribute";
 import type {Category} from "~/types/category";
+import type {Image} from "~/types/image";
 
 export interface Product {
     id?: number,
@@ -10,9 +11,5 @@ export interface Product {
     addedDate: Date,
     attributes: Attribute[],
     category: Category,
-    imageUrls?: string[],
-    imageFile?: {
-        base64: string,
-        fileName: string,
-    }[]
+    images: Image[],
 }

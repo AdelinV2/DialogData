@@ -9,7 +9,9 @@ import io.imagekit.sdk.models.results.ResultList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -25,11 +27,11 @@ public class ImageKitService {
         return imageKit.upload(request);
     }
 
-    public List<String> getProductImages(String productId) throws Exception {
-
-        String prefix = "/products/" + productId + "_";
+    public List<String> getProductImages(Integer productId) throws Exception {
+        String prefix = productId + "_";
         GetFileListRequest request = new GetFileListRequest();
-        request.setSearchQuery("name^=\"" + prefix + "\"");
+        request.setPath("/products/");
+        request.setSearchQuery("name : \"" + prefix + "\"");
         ResultList resultList = imageKit.getFileList(request);
 
         return resultList.getResults().stream()

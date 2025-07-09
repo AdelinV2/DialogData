@@ -69,7 +69,8 @@ public class ProductService {
         createdProductDto.setCategory(categoryMapper.toDto(categoryService.findCategoryByProductId(createdProduct.getId())));
         createdProductDto.setAttributes(productAttributeMapper.toDtoList(productAttributeListService.findByProductId(createdProduct.getId())));
 
-        for (ImageDto image : productDto.getImageDtos()) {
+        for (ImageDto image : productDto.getImages()) {
+            image.setFileName(createdProductDto.getId() + "_" + image.getFileName());
             imageClient.uploadImage(image);
         }
 
@@ -124,7 +125,16 @@ public class ProductService {
         }
     }
 
-    public List<String> getProductImagesByProductId(Integer productId) {
-        return imageClient.getProductImagesUrl(productId);
+    public List<ImageDto> getProductImagesByProductId(Integer productId) {
+
+        List<String> imageUrls = imageClient.getProductImagesUrl(productId);
+
+        return imageUrls.stream()
+                .map(url -> {
+                    ImageDto dto = new ImageDto();
+                    dto.setImageUrl(url);
+                    return dto;
+                })
+                .toList();
     }
 }
