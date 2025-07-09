@@ -52,7 +52,7 @@ const onAddToCart = () => {
   <div class="container mx-auto px-4 py-10">
     <p class="text-3xl font-semibold mb-4">{{ product.name }}</p>
     <div class="flex justify-between">
-      <img :alt="product.name" :src="product.imageUrl" style="height: 30rem"/>
+      <img :alt="product.name" :src="product.imageUrls?.[0]" style="height: 30rem"/>
       <div>
         <p class="text-2xl font-bold mb-4">
           <span>Price: ${{ Math.floor(product.price) }}</span>

@@ -7,6 +7,10 @@ import type {Address} from "~/types/address";
 const {user} = useUserStorage();
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 
+if (!user.value) {
+  navigateTo('/login');
+}
+
 const useExistingDelivery = ref(true);
 const useExistingBilling = ref(true);
 const billingSameAsDelivery = ref(true);
@@ -26,10 +30,10 @@ const fetchCart = () => {
   $fetch(`${apiBaseUrl}/cart/${user.value.id}`, {
     method: 'GET',
     onResponse({response}) {
-      if (response.status === 201) {
+      if (response.status === 200) {
         cart.value = response._data as Cart;
       } else {
-        console.error('Failed to fetch cart total');
+        console.error('Failed to fetch cart');
       }
     }
   }).catch((error) => {
@@ -89,7 +93,7 @@ const confirmOrder = () => {
     method: 'POST',
     body: orderDetails,
     onResponse({response}) {
-      if (response.status === 200) {
+      if (response.status === 201) {
         console.log('Order confirmed successfully');
         // TODO redirect to orders list
       } else {
@@ -192,7 +196,7 @@ const confirmOrder = () => {
             <Dropdown v-model="selectedPayment" :options="paymentMethods" optionLabel="label" optionValue="value"
                       class="w-full"/>
           </div>
-          <Button label="Confirm Order" class="w-full" severity="primary" @click="confirmOrder"/>
+          <Button label="Confirm Order" class="w-full" severity="primary" @click="confirmOrder" :disabled="cart?.entries.length === 0"/>
         </template>
       </Card>
     </div>

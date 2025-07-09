@@ -2,6 +2,12 @@
 import {ref} from 'vue'
 
 const search = ref('')
+const emit = defineEmits<{ (e: 'search', term: string): void }>()
+
+const onSearch = () => {
+  emit('search', search.value)
+}
+
 const {user, removeUser} = useUserStorage()
 
 const menuItems = [
@@ -54,17 +60,23 @@ const menuItems = [
     <template #start>
       <img src="/favicon.ico" alt="Logo" @click="navigateTo('/')"  style="height: 40px; cursor: pointer;"/>
     </template>
+
     <template #center>
       <IconField>
         <InputIcon>
-          <i class="pi pi-search" />
+          <i class="pi pi-search" @click="onSearch"/>
         </InputIcon>
-        <InputText v-model="search" placeholder="Search..." class="rounded-pill md:w-96 lg:w-lg" style=""/>
+        <InputText
+            v-model="search"
+            placeholder="Search..."
+            class="rounded-pill md:w-96 lg:w-lg"
+            @keyup.enter="onSearch"
+        />
       </IconField>
     </template>
+
     <template #end>
-      <Menubar :model="menuItems">
-      </Menubar>
+      <Menubar :model="menuItems"/>
     </template>
   </Toolbar>
 </template>

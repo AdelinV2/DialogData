@@ -1,5 +1,11 @@
 <script setup lang="ts">
 
+const {user} = useUserStorage();
+
+if (user.value) {
+  navigateTo('/');
+}
+
 </script>
 
 <template>

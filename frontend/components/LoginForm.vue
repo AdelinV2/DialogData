@@ -12,7 +12,11 @@ const loginForm = ref({
 const showForgotPassword = ref(false);
 
 const failed = ref(false);
-const {saveUser} = useUserStorage();
+const {saveUser, user} = useUserStorage();
+
+if (user.value) {
+  navigateTo('/');
+}
 
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 

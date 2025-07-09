@@ -10,5 +10,9 @@ export interface Product {
     addedDate: Date,
     attributes: Attribute[],
     category: Category,
-    imageUrl?: string,
+    imageUrls?: string[],
+    imageFile?: {
+        base64: string,
+        fileName: string,
+    }[]
 }

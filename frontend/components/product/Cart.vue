@@ -222,7 +222,7 @@ const getStockName = (product: Product) => {
             </span>
           </div>
         </div>
-        <Button label="Checkout" class="mt-4 w-full" severity="primary" @click="() => navigateTo('/checkout')"/>
+        <Button label="Checkout" class="mt-4 w-full" severity="primary" @click="() => navigateTo('/checkout')" :disabled="cartEntries.length === 0"/>
       </template>
     </Card>
   </div>
