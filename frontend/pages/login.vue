@@ -7,6 +7,9 @@
   <div class="mt-12">
     <LoginForm/>
   </div>
+
+  <Footer/>
+
 </template>
 
 <style scoped>

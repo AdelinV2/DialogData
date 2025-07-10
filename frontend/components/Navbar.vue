@@ -8,7 +8,25 @@ const onSearch = () => {
   emit('search', search.value)
 }
 
-const {user, removeUser} = useUserStorage()
+const {user, removeUser} = useUserStorage();
+const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
+const cartItems = ref(0);
+
+onMounted(() => {
+  if (user.value) {
+    $fetch(`${apiBaseUrl}/cart/${user.value.id}`, {
+      method: 'GET',
+      onResponse({response}) {
+        if (response.status === 200) {
+          cartItems.value = response._data.cartEntries.length;
+          console.log('Cart items fetched successfully:', cartItems.value);
+        } else {
+          console.error('Failed to fetch cart items');
+        }
+      }
+    });
+  }
+})
 
 const menuItems = [
   {
@@ -21,6 +39,11 @@ const menuItems = [
             label: 'Edit Profile',
             icon: 'pi pi-pencil',
             command: () => navigateTo('/profile')
+          },
+          {
+            label: 'My Orders',
+            icon: 'pi pi-list',
+            command: () => navigateTo('/orders')
           },
           {
             label: 'Logout',
@@ -43,13 +66,6 @@ const menuItems = [
             command: () => navigateTo('/register')
           }
         ]
-  },
-  {
-    label: 'Cart',
-    icon: 'pi pi-shopping-cart',
-    command: () => {
-      user.value ? navigateTo('/cart') : navigateTo('/login');
-    }
   }
 ]
 
@@ -58,7 +74,7 @@ const menuItems = [
 <template>
   <Toolbar>
     <template #start>
-      <img src="/favicon.ico" alt="Logo" @click="navigateTo('/')"  style="height: 40px; cursor: pointer;"/>
+      <img src="/favicon.ico" alt="Logo" @click="navigateTo('/')" style="height: 40px; cursor: pointer;"/>
     </template>
 
     <template #center>
@@ -76,7 +92,30 @@ const menuItems = [
     </template>
 
     <template #end>
-      <Menubar :model="menuItems"/>
+      <Menubar :model="menuItems">
+        <template #end>
+          <template v-if="cartItems > 0">
+            <OverlayBadge
+                :value="cartItems"
+                severity="info"
+                class="p-overlay-badge"
+            >
+              <i
+                  class="pi pi-shopping-cart"
+                  @click="user ? navigateTo('/cart') : navigateTo('/login')"
+                  style="font-size: 1.5rem; cursor: pointer;"
+              />
+            </OverlayBadge>
+          </template>
+          <template v-else>
+            <i
+                class="pi pi-shopping-cart"
+                @click="user ? navigateTo('/cart') : navigateTo('/login')"
+                style="font-size: 1.5rem; cursor: pointer;"
+            />
+          </template>
+        </template>
+      </Menubar>
     </template>
   </Toolbar>
 </template>

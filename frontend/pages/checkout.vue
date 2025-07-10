@@ -3,13 +3,16 @@ import {useUserStorage} from '~/composables/useUserStorage';
 import type {Cart} from "~/types/cart";
 import type {Order} from "~/types/order";
 import type {Address} from "~/types/address";
+import {navigateTo} from "#app";
 
 const {user} = useUserStorage();
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 
-if (!user.value) {
-  navigateTo('/login');
-}
+onMounted(() => {
+  if (!user.value) {
+    navigateTo('/login');
+  }
+})
 
 const useExistingDelivery = ref(true);
 const useExistingBilling = ref(true);
@@ -32,6 +35,7 @@ const fetchCart = () => {
     onResponse({response}) {
       if (response.status === 200) {
         cart.value = response._data as Cart;
+        console.log('Cart fetched successfully:', cart.value);
       } else {
         console.error('Failed to fetch cart');
       }
@@ -95,7 +99,7 @@ const confirmOrder = () => {
     onResponse({response}) {
       if (response.status === 201) {
         console.log('Order confirmed successfully');
-        // TODO redirect to orders list
+        navigateTo('/orders');
       } else {
         console.error('Failed to confirm order');
       }
@@ -196,11 +200,14 @@ const confirmOrder = () => {
             <Dropdown v-model="selectedPayment" :options="paymentMethods" optionLabel="label" optionValue="value"
                       class="w-full"/>
           </div>
-          <Button label="Confirm Order" class="w-full" severity="primary" @click="confirmOrder" :disabled="cart?.entries.length === 0"/>
+          <Button label="Confirm Order" class="w-full" severity="primary" @click="confirmOrder" :disabled="cart?.cartEntries.length === 0"/>
         </template>
       </Card>
     </div>
   </div>
+
+  <Footer/>
+
 </template>
 
 <style scoped>

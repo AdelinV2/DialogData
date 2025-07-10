@@ -1,6 +1,7 @@
 package com.dialogdata.main.dto;
 
 import com.dialogdata.main.entity.Cart;
+import com.dialogdata.main.entity.User;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -17,7 +18,7 @@ public class CartDto implements Serializable {
     Integer id;
 
     @NotNull
-    Integer userId;
+    User user;
 
     @NotNull
     BigDecimal totalPrice;

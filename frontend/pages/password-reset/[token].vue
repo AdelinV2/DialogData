@@ -118,6 +118,7 @@ verifyToken();
       <p class="text-center">Please wait while we verify your token.</p>
     </template>
   </Card>
+  <Footer />
 </template>
 
 <style scoped>

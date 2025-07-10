@@ -11,6 +11,7 @@ import com.dialogdata.main.mapper.ProductAttributeMapper;
 import com.dialogdata.main.mapper.ProductMapper;
 import com.dialogdata.main.repository.ProductRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -136,5 +137,18 @@ public class ProductService {
                     return dto;
                 })
                 .toList();
+    }
+
+    public void updateProductStock(Integer id, int quantity) {
+
+        Product product = productRepository.findById(id).orElse(null);
+
+        if (product != null) {
+            int newQuantity = product.getAvailableQuantity() + quantity;
+            product.setAvailableQuantity(newQuantity);
+            productRepository.save(product);
+        } else {
+            throw new IllegalArgumentException("Product not found with ID: " + id);
+        }
     }
 }

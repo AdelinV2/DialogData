@@ -13,6 +13,9 @@ if (user.value) {
   <div class="mt-12">
     <RegisterForm/>
   </div>
+
+  <Footer/>
+
 </template>
 
 <style scoped>

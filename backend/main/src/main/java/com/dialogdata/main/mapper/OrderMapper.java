@@ -3,6 +3,7 @@ package com.dialogdata.main.mapper;
 import com.dialogdata.main.dto.OrderDto;
 import com.dialogdata.main.entity.Order;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 

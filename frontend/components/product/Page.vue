@@ -4,7 +4,7 @@ import type { Product } from '~/types/product'
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl
 
 const products = ref<Product[]>([])
-const pageInfo = ref({ page: 0, size: 10, totalElements: 0, totalPages: 0 })
+const pageInfo = ref({ page: 0, size: 12, totalElements: 0, totalPages: 0 })
 const sort = ref({ by: 'addedDate', order: 'desc' })
 
 const sortOptions = [
@@ -36,6 +36,7 @@ const fetchProducts = () => {
         products.value = response._data.content as Product[];
         pageInfo.value.totalElements = response._data.totalElements
         pageInfo.value.totalPages = response._data.totalPages
+        isLoading.value = false
 
         console.log('Products fetched successfully:', products.value)
       }
@@ -79,6 +80,8 @@ const onSearch = (term: string) => {
   searchTerm.value = term
 }
 
+const isLoading = ref(true)
+
 onMounted(() => {
   fetchProducts()
 })
@@ -93,7 +96,7 @@ onMounted(() => {
       <ProductCategories @category-selected="onCategorySelected" />
     </div>
     <div class="flex-auto me-5">
-      <ProductList :products="products" :sort="sort" :sortOptions="sortOptions" @sort-change="onSortChange" />
+      <ProductList :rows="pageInfo.size" :loading="isLoading" :products="products" :sort="sort" :sortOptions="sortOptions" @sort-change="onSortChange" />
     </div>
   </div>
 
@@ -101,7 +104,7 @@ onMounted(() => {
     <Paginator
       :rows="pageInfo.size"
       :totalRecords="pageInfo.totalElements"
-      :rowsPerPageOptions="[10,20,30]"
+      :rowsPerPageOptions="[12,24,36]"
       :first="pageInfo.page * pageInfo.size"
       @page="onPageChange"
     />

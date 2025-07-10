@@ -6,7 +6,9 @@ import type {CartEntry} from "~/types/cartEntry";
 const props = defineProps<{
   products: Product[],
   sort?: { by: string, order: string },
-  sortOptions?: { label: string, value: { by: string, order: string } }[]
+  sortOptions?: { label: string, value: { by: string, order: string } }[],
+  loading?: boolean
+  rows: number
 }>()
 
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
@@ -172,7 +174,109 @@ const addToCart = (product: Product) => {
           </div>
         </div>
       </template>
+      <template #empty>
+        <div v-if="props.loading">
+          <div v-if="layout === 'list'" class="flex flex-col">
+            <div v-for="i in rows" :key="i">
+              <div class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
+                   :class="{ 'border-t border-surface-200 dark:border-surface-700': i !== 0 }">
+                <Skeleton class="!w-9/12 sm:!w-64 xl:!w-40 !h-24 mx-auto" />
+                <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                  <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                    <Skeleton width="8rem" height="2rem" />
+                  </div>
+                  <div class="flex flex-col md:items-end gap-8">
+                    <Skeleton width="4rem" height="2rem" />
+                    <Skeleton size="3rem" shape="circle" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div v-for="i in rows" :key="i" class="col-span-1 p-2">
+              <div class="p-6 border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded flex flex-col">
+                <div class="bg-surface-50 flex justify-center rounded p-4">
+                  <Skeleton width="75%" height="10rem" />
+                </div>
+                <div class="pt-6">
+                  <div class="flex flex-row justify-between items-start gap-2">
+                    <Skeleton width="8rem" height="2rem" />
+                  </div>
+                  <div class="flex flex-col gap-6 mt-6">
+                    <Skeleton width="4rem" height="2rem" />
+                    <Skeleton size="3rem" shape="circle" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else>
+          No available options
+        </div>
+      </template>
     </DataView>
+
+
+<!--    <DataView :value="products" :layout="layout">-->
+<!--      <template #header>-->
+<!--        <div class="flex justify-end">-->
+<!--          <SelectButton v-model="layout" :options="options" :allowEmpty="false">-->
+<!--            <template #option="{ option }">-->
+<!--              <i :class="[option === 'list' ? 'pi pi-bars' : 'pi pi-table']" />-->
+<!--            </template>-->
+<!--          </SelectButton>-->
+<!--        </div>-->
+<!--      </template>-->
+
+<!--      <template #list>-->
+<!--        <div class="flex flex-col">-->
+<!--          <div v-for="i in 6" :key="i">-->
+<!--            <div class="flex flex-col xl:flex-row xl:items-start p-6 gap-6" :class="{ 'border-t border-surface-200 dark:border-surface-700': i !== 0 }">-->
+<!--              <Skeleton class="!w-9/12 sm:!w-64 xl:!w-40 !h-24 mx-auto" />-->
+<!--              <div class="flex flex-col sm:flex-row justify-between items-center xl:items-start flex-1 gap-6">-->
+<!--                <div class="flex flex-col items-center sm:items-start gap-4">-->
+<!--                  <Skeleton width="8rem" height="2rem" />-->
+<!--                  <Skeleton width="6rem" height="1rem" />-->
+
+<!--                  <div class="flex items-center gap-4">-->
+<!--                    <Skeleton width="6rem" height="1rem" />-->
+<!--                    <Skeleton width="3rem" height="1rem" />-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="flex sm:flex-col items-center sm:items-end gap-4 sm:gap-2">-->
+<!--                  <Skeleton width="4rem" height="2rem" />-->
+<!--                  <Skeleton size="3rem" shape="circle" />-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </template>-->
+
+<!--      <template #grid>-->
+<!--        <div class="grid grid-cols-12 gap-4">-->
+<!--          <div v-for="i in 6" :key="i" class="col-span-12 sm:col-span-6 xl:col-span-4 p-2">-->
+<!--            <div class="p-6 border border-surface-200 dark:border-surface-700 bg-surface-0 dark:bg-surface-900 rounded">-->
+<!--              <div class="flex flex-wrap items-center justify-between gap-2">-->
+<!--                <Skeleton width="6rem" height="2rem" />-->
+<!--                <Skeleton width="3rem" height="1rem" />-->
+<!--              </div>-->
+<!--              <div class="flex flex-col items-center gap-4 py-8">-->
+<!--                <Skeleton width="75%" height="10rem" />-->
+<!--                <Skeleton width="8rem" height="2rem" />-->
+<!--                <Skeleton width="6rem" height="1rem" />-->
+<!--              </div>-->
+<!--              <div class="flex items-center justify-between">-->
+<!--                <Skeleton width="4rem" height="2rem" />-->
+<!--                <Skeleton width="6rem" height="1rem" shape="circle" size="3rem" />-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </template>-->
+<!--    </DataView>-->
   </div>
 
 </template>

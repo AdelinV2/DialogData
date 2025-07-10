@@ -99,12 +99,12 @@ public class CartService {
             return null;
         }
 
-        Product product = productService.findProductById(cartEntryDto.getProductId());
+        Product product = productService.findProductById(cartEntryDto.getProduct().getId());
 
         List<CartEntry> existingEntries = cartEntryService.findAllByCartId(cart.getId());
 
         Optional<CartEntry> existingEntry = existingEntries.stream()
-                .filter(entry -> entry.getProduct().getId().equals(cartEntryDto.getProductId()))
+                .filter(entry -> entry.getProduct().getId().equals(cartEntryDto.getProduct().getId()))
                 .findFirst();
 
         CartEntry cartEntry;

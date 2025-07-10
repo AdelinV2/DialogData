@@ -45,13 +45,13 @@ public class OrderController {
     public ResponseEntity<OrderDto> getOrderById(@Parameter(description = "ID of the order", required = true)
                                                  @PathVariable("id") Integer id) {
 
-        Order order = orderService.findById(id);
+        OrderDto orderDto = orderService.getOrderDtoById(id);
 
-        if (order == null) {
+        if (orderDto == null) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(orderMapper.toDto(order));
+        return ResponseEntity.ok(orderDto);
     }
 
     @Operation(summary = "Create a new order")

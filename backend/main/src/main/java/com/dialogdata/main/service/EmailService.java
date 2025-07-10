@@ -1,5 +1,6 @@
 package com.dialogdata.main.service;
 
+import com.dialogdata.main.entity.Order;
 import com.dialogdata.main.entity.PasswordReset;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
     private final PasswordResetService passwordResetService;
+    private final ProductService productService;
 
     @Value("${EMAIL_USERNAME}")
     private String emailUsername;
@@ -39,6 +41,23 @@ public class EmailService {
 
         String subject = "Password Reset Request";
         String body = "To reset your password, please click the following link:\n" + resetLink;
+
+        sendEmail(email, subject, body);
+    }
+
+    public void sendOrderEmail(String email, Order order) {
+
+        String subject = "Order Confirmation";
+
+        String body = "Thank you for your order! Your order details are as follows:\n" +
+                "Order ID: " + order.getId() + "\n" +
+                "Total Amount: " + order.getTotalPrice() + "\n" +
+                "Items:\n" + order.getCart().getCartEntries().stream()
+                .map(entry -> "Name: " + productService.findProductById(entry.getProduct().getId()).getName() +
+                        ", Quantity: " + entry.getQuantity() +
+                        ", Price: " + entry.getTotalPricePerEntry())
+                .collect(java.util.stream.Collectors.joining("\n")) + "\n" +
+                "Thank you for shopping with us! ❤️";
 
         sendEmail(email, subject, body);
     }

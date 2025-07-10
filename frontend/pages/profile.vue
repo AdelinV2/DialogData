@@ -116,6 +116,9 @@ const onSubmit = () => {
       </template>
     </Card>
   </div>
+
+  <Footer />
+
 </template>
 
 <style scoped>

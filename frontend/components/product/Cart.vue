@@ -33,73 +33,80 @@ const onQuantityChange = (event: any) => {
   const entry = cartEntries.value[event.index];
   entry.quantity = event.value;
 
-  $fetch(`${apiBaseUrl}/cart/update`, {
-    method: 'PUT',
-    body: entry,
-    params: {
-      userId: user.value.id,
-      productId: entry.productId,
-      quantity: entry.quantity,
-    },
-    onResponse({response}) {
-      if (response.status === 200) {
-        console.log('Cart updated successfully');
-      } else {
-        console.error('Failed to update cart');
+  if (entry.product && entry.product.id) {
+    $fetch(`${apiBaseUrl}/cart/update`, {
+      method: 'PUT',
+      body: entry,
+      params: {
+        userId: user.value.id,
+        productId: entry.product.id,
+        quantity: entry.quantity,
+      },
+      onResponse({response}) {
+        if (response.status === 200) {
+          console.log('Cart updated successfully');
+        } else {
+          console.error('Failed to update cart');
+        }
       }
-    }
-  }).catch((error) => {
-    console.error('Error updating cart:', error);
-  });
+    }).catch((error) => {
+      console.error('Error updating cart:', error);
+    });
+  }
 };
 
 const onRemoveItem = (index: number) => {
   const entry = cartEntries.value[index];
-  $fetch(`${apiBaseUrl}/cart/remove`, {
-    method: 'DELETE',
-    params: {
-      userId: user.value.id,
-      productId: entry.productId
-    },
-    onResponse({response}) {
-      if (response.status === 200) {
-        cartEntries.value.splice(index, 1);
-        delete products.value[entry.productId];
-        toast.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Item removed from cart',
-          life: 3000
-        });
-      } else {
-        toast.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to remove item from cart',
-          life: 3000
-        });
+  if (entry.product && entry.product.id) {
+    $fetch(`${apiBaseUrl}/cart/remove`, {
+      method: 'DELETE',
+      params: {
+        userId: user.value.id,
+        productId: entry.product.id
+      },
+      onResponse({response}) {
+        if (response.status === 200) {
+          cartEntries.value.splice(index, 1);
+          delete products.value[entry.product.id as number];
+
+          toast.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Item removed from cart',
+            life: 3000
+          });
+        } else {
+          toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to remove item from cart',
+            life: 3000
+          });
+        }
       }
-    }
-  }).catch((error) => {
-    console.error('Error removing item from cart:', error);
-  });
+    }).catch((error) => {
+      console.error('Error removing item from cart:', error);
+    });
+  }
 };
 
 const fetchProducts = () => {
   products.value = {};
   for (const entry of cartEntries.value) {
-    $fetch(`${apiBaseUrl}/products/${entry.productId}`, {
-      method: 'GET',
-      onResponse({response}) {
-        if (response.status === 200) {
-          const product = response._data as Product;
-          products.value[entry.productId] = product;
-          console.log(`Product ${product.name} fetched successfully: `, product);
+    if (entry.product && entry.product.id) {
+      $fetch(`${apiBaseUrl}/products/${entry.product.id}`, {
+        method: 'GET',
+        onResponse({response}) {
+          if (response.status === 200) {
+            const product = response._data as Product;
+            products.value[entry.product.id as number] = product;
+            console.log(`Product ${product.name} fetched successfully: `, product);
+          }
         }
-      }
-    }).catch((error) => {
-      console.error('Error fetching product:', error);
-    });
+      }).catch((error) => {
+        console.error('Error fetching product:', error);
+      });
+    }
   }
 };
 
@@ -136,34 +143,37 @@ const getStockName = (product: Product) => {
                    :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }">
                 <div class="md:w-40 relative">
                   <img
-                      v-if="products[entry.productId]"
+                      v-if="entry.product && entry.product.id && products[entry.product.id]"
                       class="block xl:block mx-auto rounded w-full"
-                      :src="`${products[entry.productId].images[0].imageUrl}`"
-                      :alt="products[entry.productId].name"
+                      :src="`${products[entry.product.id].images[0].imageUrl}`"
+                      :alt="products[entry.product.id].name"
                   />
                 </div>
                 <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
                   <div class="flex flex-row md:flex-col justify-between items-start gap-2">
                     <div class="relative bg-black/70 rounded-border" style="left: 4px; top: 4px">
                       <Tag
-                          v-if="products[entry.productId]"
-                          :value="getStockName(products[entry.productId])"
-                          :severity="getSeverity(products[entry.productId])"
+                          v-if="entry.product && entry.product.id && products[entry.product.id]"
+                          :value="getStockName(products[entry.product.id])"
+                          :severity="getSeverity(products[entry.product.id])"
                       ></Tag>
                     </div>
                     <div>
                       <div class="text-lg font-medium mt-2">
-                        {{ products[entry.productId]?.name || 'Product' }}
+                        {{ entry.product && entry.product.id && products[entry.product.id]?.name || 'Product' }}
                       </div>
                     </div>
                   </div>
                   <div class="flex flex-col md:items-end gap-8">
-                    <span class="text-2xl font-bold">
-                      <span v-if="products[entry.productId]">${{ Math.floor(products[entry.productId].price) }}</span>
-                      <span v-if="products[entry.productId]" class="text-base align-middle">
-                        {{ (products[entry.productId].price % 1).toFixed(2).slice(1) }}
-                      </span>
-                    </span>
+                              <span class="text-2xl font-bold">
+                                <span v-if="entry.product && entry.product.id && products[entry.product.id]">${{
+                                    Math.floor(products[entry.product.id].price)
+                                  }}</span>
+                                <span v-if="entry.product && entry.product.id && products[entry.product.id]"
+                                      class="text-base align-middle">
+                                  {{ (products[entry.product.id].price % 1).toFixed(2).slice(1) }}
+                                </span>
+                              </span>
                     <div class="flex items-center mt-2">
                       <Button
                           icon="pi pi-minus"
@@ -178,8 +188,7 @@ const getStockName = (product: Product) => {
                           icon="pi pi-plus"
                           class="p-button-rounded p-button-text"
                           @click="onQuantityChange({ index, value: entry.quantity + 1 })"
-                          :disabled="products[entry.productId]?.availableQuantity <= entry.quantity"
-                          aria-label="Increase quantity"
+                          :disabled="!!(entry.product && entry.product.id && products[entry.product.id]?.availableQuantity !== undefined && products[entry.product.id].availableQuantity <= entry.quantity)" aria-label="Increase quantity"
                           type="button"
                       />
                       <Button
@@ -203,17 +212,20 @@ const getStockName = (product: Product) => {
       <template #content>
         <div class="flex flex-col gap-4">
           <div v-for="(entry, index) in cartEntries" :key="entry.id" class="flex items-center justify-between">
-            <span>
-              {{ products[entry.productId]?.name || 'Product' }} <span class="font-bold"> ({{ entry.quantity }}) </span>
-            </span>
+                      <span>
+                        {{ entry.product && entry.product.id && products[entry.product.id]?.name || 'Product' }} <span
+                          class="font-bold"> ({{ entry.quantity }}) </span>
+                      </span>
             <span>${{ (entry.pricePerPiece * entry.quantity).toFixed(2) }}</span>
           </div>
           <hr class="my-4"/>
           <div class="flex items-center justify-between">
             <span class="font-bold">Total:</span>
             <span class="text-2xl font-bold">
-              ${{ cartEntries.reduce((total, entry) => total + (entry.pricePerPiece * entry.quantity), 0).toFixed(2) }}
-            </span>
+                        ${{
+                cartEntries.reduce((total, entry) => total + (entry.pricePerPiece * entry.quantity), 0).toFixed(2)
+              }}
+                      </span>
           </div>
         </div>
         <Button label="Checkout" class="mt-4 w-full" severity="primary" @click="() => navigateTo('/checkout')"

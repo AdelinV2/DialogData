@@ -19,7 +19,7 @@ public class CartEntryDto implements Serializable {
     Integer id;
 
     @NotNull
-    Integer productId;
+    ProductDto product;
 
     @NotNull
     Integer quantity;
