@@ -10,6 +10,9 @@ const {user} = useUserStorage();
 const toast = useToast();
 
 onMounted(() => {
+  if (!user.value) {
+    navigateTo('/login');
+  }
   fetchCart();
 });
 
@@ -39,7 +42,7 @@ const onQuantityChange = (event: any) => {
       body: entry,
       params: {
         userId: user.value.id,
-        productId: entry.product.id,
+        product: entry.product,
         quantity: entry.quantity,
       },
       onResponse({response}) {
@@ -183,12 +186,14 @@ const getStockName = (product: Product) => {
                           aria-label="Decrease quantity"
                           type="button"
                       />
-                      <span class="px-3 font-semibold text-lg">{{ entry.quantity }}</span>
+                      <InputNumber :min="1" :max="entry.quantity" class="px-3 font-semibold text-lg"
+                                   v-model="entry.quantity"/>
                       <Button
                           icon="pi pi-plus"
                           class="p-button-rounded p-button-text"
                           @click="onQuantityChange({ index, value: entry.quantity + 1 })"
-                          :disabled="!!(entry.product && entry.product.id && products[entry.product.id]?.availableQuantity !== undefined && products[entry.product.id].availableQuantity <= entry.quantity)" aria-label="Increase quantity"
+                          :disabled="!!(entry.product && entry.product.id && products[entry.product.id]?.availableQuantity !== undefined && products[entry.product.id].availableQuantity <= entry.quantity)"
+                          aria-label="Increase quantity"
                           type="button"
                       />
                       <Button
@@ -222,10 +227,8 @@ const getStockName = (product: Product) => {
           <div class="flex items-center justify-between">
             <span class="font-bold">Total:</span>
             <span class="text-2xl font-bold">
-                        ${{
-                cartEntries.reduce((total, entry) => total + (entry.pricePerPiece * entry.quantity), 0).toFixed(2)
-              }}
-                      </span>
+              ${{cartEntries.reduce((total, entry) => total + (entry.pricePerPiece * entry.quantity), 0).toFixed(2) }}
+            </span>
           </div>
         </div>
         <Button label="Checkout" class="mt-4 w-full" severity="primary" @click="() => navigateTo('/checkout')"

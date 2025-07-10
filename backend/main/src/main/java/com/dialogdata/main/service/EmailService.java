@@ -2,11 +2,14 @@ package com.dialogdata.main.service;
 
 import com.dialogdata.main.entity.Order;
 import com.dialogdata.main.entity.PasswordReset;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,6 +35,19 @@ public class EmailService {
         mailSender.send(message);
     }
 
+    public void sendHtmlEmail(String to, String subject, String body) throws MessagingException {
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setFrom(emailUsername);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(body, true);
+
+        mailSender.send(message);
+    }
+
     @Transactional
     public void sendPasswordResetEmail(String email) {
 
@@ -45,20 +61,25 @@ public class EmailService {
         sendEmail(email, subject, body);
     }
 
-    public void sendOrderEmail(String email, Order order) {
+    public void sendOrderEmail(String email, Order order) throws MessagingException {
 
         String subject = "Order Confirmation";
 
-        String body = "Thank you for your order! Your order details are as follows:\n" +
-                "Order ID: " + order.getId() + "\n" +
-                "Total Amount: " + order.getTotalPrice() + "\n" +
-                "Items:\n" + order.getCart().getCartEntries().stream()
-                .map(entry -> "Name: " + productService.findProductById(entry.getProduct().getId()).getName() +
-                        ", Quantity: " + entry.getQuantity() +
-                        ", Price: " + entry.getTotalPricePerEntry())
-                .collect(java.util.stream.Collectors.joining("\n")) + "\n" +
-                "Thank you for shopping with us! ❤️";
+        String body = "<h2>Order Confirmation</h2>" +
+                "<p>Thank you for your order! Your order details are as follows:</p>" +
+                "<p><strong>Order ID:</strong> " + order.getId() + "<br>" +
+                "<strong>Total Amount:</strong> " + order.getTotalPrice() + "</p>" +
+                "<table border='1' cellpadding='8' cellspacing='0' style='border-collapse:collapse;'>" +
+                "<tr><th>Name</th><th>Quantity</th><th>Price</th></tr>" +
+                order.getCart().getCartEntries().stream()
+                        .map(entry -> {
+                            String name = productService.findProductById(entry.getProduct().getId()).getName();
+                            return "<tr><td>" + name + "</td><td>" + entry.getQuantity() + "</td><td>" + entry.getTotalPricePerEntry() + "</td></tr>";
+                        })
+                        .collect(java.util.stream.Collectors.joining()) +
+                "</table>" +
+                "<p>Thank you for shopping with us! &#10084;</p>";
 
-        sendEmail(email, subject, body);
+        sendHtmlEmail(email, subject, body);
     }
 }

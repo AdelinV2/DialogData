@@ -39,7 +39,7 @@ const firstRegisterForm = ref({
 
 const sameAddress = ref(false);
 
-const { saveUser } = useUserStorage();
+const {saveUser} = useUserStorage();
 
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 
@@ -189,7 +189,9 @@ const onSecondSubmit = () => {
               </div>
             </div>
           </div>
-          <Button type="submit" severity="secondary" label="Create account"></Button>
+          <Button type="submit" severity="secondary" label="Create account"
+                  :disabled="!user.firstName || !user.lastName || !user.phoneNumber || !user.deliveryAddress.streetLine || !user.deliveryAddress.postalCode || !user.deliveryAddress.city || !user.deliveryAddress.county || !user.deliveryAddress.country || (sameAddress === false && (!user.billingAddress.streetLine || !user.billingAddress.postalCode || !user.billingAddress.city || !user.billingAddress.county || !user.billingAddress.country))"
+          ></Button>
         </Form>
       </template>
     </Card>

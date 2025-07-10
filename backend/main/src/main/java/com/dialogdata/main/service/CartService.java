@@ -93,7 +93,7 @@ public class CartService {
     @Transactional
     public CartEntry addProductToCart(CartEntryDto cartEntryDto, Integer userId) {
 
-        Cart cart = findByUserId(userId);
+        Cart cart = cartRepository.findByUserIdAndActive(userId, true);
 
         if (cart == null) {
             return null;

@@ -6,6 +6,7 @@ import com.dialogdata.main.entity.Cart;
 import com.dialogdata.main.entity.Order;
 import com.dialogdata.main.mapper.OrderMapper;
 import com.dialogdata.main.repository.OrderRepository;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -43,7 +44,11 @@ public class OrderService {
         });
 
         Order createdOrder = orderRepository.save(order);
-        emailService.sendOrderEmail(userService.getUserById(order.getUserId()).getEmail(), createdOrder);
+        try {
+            emailService.sendOrderEmail(userService.getUserById(order.getUserId()).getEmail(), createdOrder);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
 
         return createdOrder;
     }

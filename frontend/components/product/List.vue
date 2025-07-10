@@ -46,7 +46,7 @@ const addToCart = (product: Product) => {
     return;
   }
   const cartItem = {
-    productId: product.id,
+    product: product,
     quantity: 1,
     pricePerPiece: product.price,
     totalPricePerEntry: product.price,
