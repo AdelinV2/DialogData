@@ -13,6 +13,7 @@ const props = defineProps<{
 
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 const {user} = useUserStorage();
+const {t} = useI18n();
 const layout = ref('grid');
 const options = ref(['list', 'grid']);
 const toast = useToast();
@@ -24,9 +25,9 @@ const getSeverity = (product: Product) => {
 }
 
 const getStockLabel = (product: Product) => {
-  if (product.availableQuantity > 5) return 'In Stock';
-  else if (product.availableQuantity > 0) return 'Low Stock';
-  else return 'Out of Stock';
+  if (product.availableQuantity > 5) return t('product.inStock');
+  else if (product.availableQuantity > 0) return t('product.limitedStock');
+  else return t('product.outOfStock');
 };
 
 const emit = defineEmits(['sort-change']);
@@ -60,14 +61,14 @@ const addToCart = (product: Product) => {
         toast.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Product added to cart successfully',
+          detail: t('product.addedToCart'),
           life: 2000
         });
       } else {
         toast.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to add product to cart',
+          detail: t('product.failedToAdd'),
           life: 3000
         });
       }
@@ -123,7 +124,7 @@ const addToCart = (product: Product) => {
                       <span class="text-base align-middle">{{ (item.price % 1).toFixed(2).slice(1) }}</span>
                     </span>
                   <div class="flex flex-row-reverse md:flex-row gap-2">
-                    <Button icon="pi pi-shopping-cart" label="Add to Cart"
+                    <Button icon="pi pi-shopping-cart" :label="t('product.addToCart')"
                             :disabled="item.availableQuantity === 0"
                             @click.stop="addToCart(item)"
                             class="flex-auto md:flex-initial whitespace-nowrap"></Button>
@@ -163,7 +164,7 @@ const addToCart = (product: Product) => {
                       <span class="text-base align-middle">{{ (item.price % 1).toFixed(2).slice(1) }}</span>
                     </span>
                   <div class="flex gap-2">
-                    <Button icon="pi pi-shopping-cart" label="Add to Cart"
+                    <Button icon="pi pi-shopping-cart" :label="t('product.addToCart')"
                             :disabled="item.availableQuantity === 0"
                             @click.stop="addToCart(item)"
                             class="flex-auto whitespace-nowrap"></Button>

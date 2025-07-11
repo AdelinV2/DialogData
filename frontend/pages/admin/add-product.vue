@@ -5,7 +5,8 @@
 <template>
 
   <Navbar/>
-  <AdminAddProduct/>
+  <AdminAddProduct class="min-h-[calc(100vh-250px)]"/>
+  <Footer/>
 
 </template>
 

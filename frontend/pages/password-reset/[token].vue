@@ -73,7 +73,7 @@ verifyToken();
 
 <template>
   <Navbar/>
-  <Card class="w-full max-w-sm mt-12 justify-self-center" v-if="validToken === 'true'">
+  <Card class="w-full max-w-sm mt-12 justify-self-center min-h-[calc(100vh-250px)]" v-if="validToken === 'true'">
     <template #title>Reset password</template>
     <template #content>
       <Form v-slot="$form" @submit="onSubmit" class="flex justify-center flex-col gap-6 mt-5">

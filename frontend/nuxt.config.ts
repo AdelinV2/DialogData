@@ -4,14 +4,31 @@ import Aura from '@primeuix/themes/aura'
 export default defineNuxtConfig({
     compatibilityDate: '2025-05-15',
     devtools: {enabled: true},
-    plugins: [
-
-    ],
+    plugins: [],
     modules: [
         '@nuxtjs/tailwindcss',
         '@primevue/nuxt-module',
-        '@vueuse/nuxt'
+        '@vueuse/nuxt',
+        '@nuxtjs/i18n',
     ],
+    i18n: {
+        lazy: true,
+        langDir: '../locales',
+        strategy: 'prefix',
+        locales: [
+            {
+                code: 'en',
+                name: 'English',
+                file: 'en.json',
+            },
+            {
+                code: 'ro',
+                name: 'Română',
+                file: 'ro.json',
+            }
+        ],
+        defaultLocale: 'en',
+    },
     primevue: {
         options: {
             theme: {
@@ -20,7 +37,7 @@ export default defineNuxtConfig({
         }
     },
     css: [
-       '@/assets/styles/main.scss',
+        '@/assets/styles/main.scss',
     ],
     runtimeConfig: {
         public: {

@@ -25,7 +25,7 @@ $fetch(`${apiBaseUrl}/products/${id}`, {
 
 <template>
   <Navbar />
-  <ProductDetails :product="product" v-if="product" />
+  <ProductDetails class="min-h-[calc(100vh-250px)]" :product="product" v-if="product" />
   <Footer />
 </template>
 

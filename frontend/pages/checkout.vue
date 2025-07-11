@@ -113,7 +113,7 @@ const confirmOrder = () => {
 
 <template>
   <Navbar/>
-  <div class="flex flex-row gap-8 container mx-auto py-10">
+  <div class="flex flex-row gap-8 container mx-auto py-10 min-h-[calc(100vh-250px)]">
     <div class="flex-1">
       <Card class="mb-6">
         <template #title>Delivery Address</template>

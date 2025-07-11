@@ -5,6 +5,7 @@ import type {ListboxChangeEvent} from "primevue";
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl
 const categories = ref<Category[]>([])
 const selectedCategory = ref<number|null>(null)
+const { t } = useI18n()
 
 const emit = defineEmits<{
   (e: 'category-selected', categoryId: number|null): void
@@ -39,7 +40,7 @@ const onCategoryChange = (event: ListboxChangeEvent) => {
     @change="onCategoryChange"
   >
     <template #header>
-      <h2 class="text-lg font-semibold">Select a Category</h2>
+      <h2 class="text-lg font-semibold">{{ t('product.categories') }}</h2>
     </template>
   </Listbox>
 </template>

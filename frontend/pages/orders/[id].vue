@@ -4,7 +4,8 @@ import {useUserStorage} from "~/composables/useUserStorage";
 import {onMounted} from "vue";
 import type {Order} from "~/types/order";
 
-const {user} = useUserStorage()
+const {user} = useUserStorage();
+const {t} = useI18n();
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 const order = ref<Order | null>(null);
 
@@ -52,27 +53,27 @@ const fetchOrder = () => {
 
   <Navbar/>
 
-  <div v-if="order" class="container mx-auto py-10">
+  <div v-if="order" class="container mx-auto py-10 min-h-[calc(100vh-250px)]">
     <div>
-      <h1 class="text-3xl font-bold">Order #{{ order.id }}</h1>
-      <div class="text-gray-500 text-lg">Placed on {{ order.orderDate }}</div>
+      <h1 class="text-3xl font-bold">{{ t('order.order') }} #{{ order.id }}</h1>
+      <div class="text-gray-500 text-lg">{{t('order.orderDate')}}: {{ order.orderDate }}</div>
     </div>
 
     <div class="flex flex-col md:flex-row gap-6">
       <Card class="flex-1">
-        <template #title>Delivery Address</template>
+        <template #title>{{ t('order.deliveryAddress') }}</template>
         <template #content>
           <div>
             <div>{{ order.deliveryAddress.streetLine }}</div>
             <div>{{ order.deliveryAddress.city }}, {{ order.deliveryAddress.postalCode }}</div>
             <div>{{ order.deliveryAddress.country }}</div>
-            <div>Phone number: {{ user.phoneNumber }}</div>
+            <div>{{t('order.phoneNumber')}}: {{ user.phoneNumber }}</div>
           </div>
         </template>
       </Card>
 
       <Card class="flex-1">
-        <template #title>Billing Address</template>
+        <template #title>{{ t('order.billingAddress') }}</template>
         <template #content>
           <div>
             <div>{{ order.invoiceAddress.streetLine }}</div>
@@ -83,14 +84,14 @@ const fetchOrder = () => {
       </Card>
 
       <Card class="flex-1">
-        <template #title>Payment & Total</template>
+        <template #title>{{ t('order.paymentMethod') }} & {{ t('order.totalPrice') }}</template>
         <template #content>
           <div class="mb-2">
-            <span class="font-semibold">Payment Method:</span>
+            <span class="font-semibold">{{ t('order.paymentMethod') }}:</span>
             <Tag :value="order.paymentType" class="ml-2" />
           </div>
           <div class="mt-4">
-            <span class="font-semibold">Total Price:</span>
+            <span class="font-semibold">{{ t('order.totalPrice') }}:</span>
             <span class="text-2xl font-bold ml-2">${{ order.totalPrice.toFixed(2) }}</span>
           </div>
         </template>
@@ -98,10 +99,10 @@ const fetchOrder = () => {
     </div>
 
     <Card class="mt-12">
-      <template #title>Ordered Products</template>
+      <template #title>{{ t('order.items') }}</template>
       <template #content>
         <DataTable :value="order.cart.cartEntries" dataKey="id" responsiveLayout="scroll">
-          <Column field="product.name" header="Product">
+          <Column field="product.name" :header="t('order.product')">
             <template #body="{ data }">
               <div class="flex items-center">
                 <img
@@ -117,8 +118,8 @@ const fetchOrder = () => {
               </div>
             </template>
           </Column>
-          <Column field="quantity" header="Quantity" />
-          <Column field="pricePerPiece" header="Price per Piece">
+          <Column field="quantity" :header="t('order.quantity')" />
+          <Column field="pricePerPiece" :header="t('order.pricePerPiece')">
             <template #body="{ data }">
               ${{ data.pricePerPiece.toFixed(2) }}
             </template>

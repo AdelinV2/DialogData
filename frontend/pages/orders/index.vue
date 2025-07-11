@@ -6,6 +6,7 @@ import {navigateTo} from "#app";
 const orders = ref([] as Order[])
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 const {user} = useUserStorage();
+const {t} = useI18n();
 
 onMounted(() => {
   if (!user.value) {
@@ -52,27 +53,27 @@ const onPageChange = (event: any) => {
 
   <Navbar />
 
-  <div class="card mt-8 mx-14">
-    <h2 class="text-xl font-bold mb-4">My Orders</h2>
+  <div class="card mt-8 mx-14 min-h-[calc(100vh-250px)]">
+    <h2 class="text-xl font-bold mb-4">{{ t('order.myOrders') }}</h2>
     <DataTable :value="orders" dataKey="id" responsiveLayout="scroll">
-      <Column field="id" header="Order ID" />
-      <Column field="orderDate" header="Order Date">
+      <Column field="id" :header="t('order.orderNumber')" />
+      <Column field="orderDate" :header="t('order.orderDate')">
         <template #body="{ data }">
           {{ new Date(data.orderDate).toLocaleString() }}
         </template>
       </Column>
-      <Column field="totalPrice" header="Total Price">
+      <Column field="totalPrice" :header="t('order.totalPrice')">
         <template #body="{ data }">
           ${{ data.totalPrice.toFixed(2) }}
         </template>
       </Column>
-      <Column header="Actions">
+      <Column :header="t('order.actions')">
         <template #body="{ data }">
-          <Button label="Details" icon="pi pi-search" @click="navigateTo(`/orders/${data.id}`)" />
+          <Button :label="t('order.viewOrder')" icon="pi pi-search" @click="navigateTo(`/orders/${data.id}`)" />
         </template>
       </Column>
     </DataTable>
-    <div v-if="orders.length === 0" class="text-center py-4">No orders found.</div>
+    <div v-if="orders.length === 0" class="text-center py-4">{{ t('order.noOrders') }}</div>
   </div>
 
   <div class="card mt-12">

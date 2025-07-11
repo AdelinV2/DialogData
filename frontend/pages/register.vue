@@ -9,8 +9,9 @@ if (user.value) {
 </script>
 
 <template>
+
   <Navbar/>
-  <div class="mt-12">
+  <div class="mt-12 min-h-[calc(100vh-250px)]">
     <RegisterForm/>
   </div>
 

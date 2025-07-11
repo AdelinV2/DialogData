@@ -3,6 +3,7 @@ import type { Product } from '~/types/product'
 
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl
 
+const {t} = useI18n()
 const products = ref<Product[]>([])
 const pageInfo = ref({ page: 0, size: 12, totalElements: 0, totalPages: 0 })
 const sort = ref({ by: 'addedDate', order: 'desc' })
@@ -91,7 +92,7 @@ onMounted(() => {
 <template>
   <Navbar @search="onSearch" />
 
-  <div class="flex mt-6">
+  <div class="flex mt-6 min-h-[calc(100vh-330px)]">
     <div class="flex-none me-10">
       <ProductCategories @category-selected="onCategorySelected" />
     </div>

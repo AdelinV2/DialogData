@@ -8,6 +8,7 @@ const forgotPassword = ref({
   sent: false,
 })
 
+const {t} = useI18n();
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 const onForgotSubmit = () => {
   $fetch(apiBaseUrl + '/password-reset/request', {
@@ -29,22 +30,23 @@ const onForgotSubmit = () => {
 </script>
 
 <template>
-  <Dialog v-model:visible="forgotPassword.show" modal header="Reset Password" :closable="true"
+  <Dialog v-model:visible="forgotPassword.show" modal :header="t('resetPassword.resetPassword')" :closable="true"
           :style="{ width: '350px' }">
     <div v-if="!forgotPassword.sent" class="flex flex-col gap-4">
       <InputGroup>
         <InputGroupAddon slot="prepend">
           <i class="pi pi-envelope"/>
         </InputGroupAddon>
-        <InputText type="email" placeholder="Enter your email" v-model="forgotPassword.email"/>
+        <InputText type="email" :placeholder="t('resetPassword.email')" v-model="forgotPassword.email"/>
       </InputGroup>
       <Button label="Send reset link" @click="onForgotSubmit" :disabled="!forgotPassword.email"/>
     </div>
     <div v-else class="flex flex-col items-center justify-center text-center">
       <Message severity="success" size="small" variant="simple">
-        If the email exists, a reset link has been sent.
+        {{ t('resetPassword.resetLinkSent') }}
       </Message>
-      <Button label="Back to login" @click="() => { forgotPassword.show = false; forgotPassword.sent = false; $router.push('/login'); }"
+      <Button :label="t('resetPassword.backToLogin')"
+              @click="() => { forgotPassword.show = false; forgotPassword.sent = false; $router.push('/login'); }"
               class="mt-4"/>
     </div>
   </Dialog>

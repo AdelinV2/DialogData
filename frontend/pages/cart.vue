@@ -7,7 +7,7 @@ const {user} = useUserStorage();
 
 <template>
   <Navbar />
-  <ProductCart />
+  <ProductCart class="min-h-[calc(100vh-250px)]" />
   <Footer />
 </template>
 

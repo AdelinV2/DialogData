@@ -35,6 +35,10 @@ public class CartService {
         return cartRepository.findByUserId(userId);
     }
 
+    public Cart findActiveByUserId(Integer userId) {
+        return cartRepository.findByUserIdAndActive(userId, true);
+    }
+
     public CartDto findCartDtoByUserId(Integer userId) {
 
         Cart cart = cartRepository.findByUserIdAndActive(userId, true);
@@ -124,6 +128,10 @@ public class CartService {
             cartEntry = cartEntryService.update(cartEntry.getId(), cartEntry);
         }
 
+        if (cartEntry.getQuantity() > product.getAvailableQuantity()) {
+            throw new IllegalArgumentException("Not enough stock for product: " + product.getName());
+        }
+
         cart.setTotalPrice(cart.getTotalPrice().add(cartEntryDto.getPricePerPiece().multiply(BigDecimal.valueOf(cartEntryDto.getQuantity()))));
         cartRepository.save(cart);
 
@@ -154,7 +162,7 @@ public class CartService {
     @Transactional
     public Cart updateProductQuantityInCart(Integer userId, Integer productId, Integer quantity) {
 
-        Cart cart = findByUserId(userId);
+        Cart cart = findActiveByUserId(userId);
 
         if (cart == null) {
             return null;

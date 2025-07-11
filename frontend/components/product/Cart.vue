@@ -42,7 +42,7 @@ const onQuantityChange = (event: any) => {
       body: entry,
       params: {
         userId: user.value.id,
-        product: entry.product,
+        productId: entry.product.id,
         quantity: entry.quantity,
       },
       onResponse({response}) {
@@ -186,7 +186,7 @@ const getStockName = (product: Product) => {
                           aria-label="Decrease quantity"
                           type="button"
                       />
-                      <InputNumber :min="1" :max="entry.quantity" class="px-3 font-semibold text-lg"
+                      <InputNumber :min="1" :max="entry.quantity" class="px-3 font-semibold text-lg" input-class="w-15"
                                    v-model="entry.quantity"/>
                       <Button
                           icon="pi pi-plus"

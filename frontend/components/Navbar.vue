@@ -3,6 +3,7 @@ import {ref} from 'vue'
 
 const search = ref('')
 const emit = defineEmits<{ (e: 'search', term: string): void }>()
+const { t, locale, setLocale } = useI18n()
 
 const onSearch = () => {
   emit('search', search.value)
@@ -30,23 +31,23 @@ onMounted(() => {
 
 const menuItems = [
   {
-    label: user.value ? `${user.value.firstName} ${user.value.lastName}` : 'My account',
+    label: user.value ? `${user.value.firstName} ${user.value.lastName}` : t('navbar.myAccount'),
     icon: 'pi pi-user',
     submenuIcon: 'pi pi-chevron-down',
     items: user.value ?
         [
           {
-            label: 'Edit Profile',
+            label: t('navbar.editProfile'),
             icon: 'pi pi-pencil',
             command: () => navigateTo('/profile')
           },
           {
-            label: 'My Orders',
+            label: t('navbar.orders'),
             icon: 'pi pi-list',
             command: () => navigateTo('/orders')
           },
           {
-            label: 'Logout',
+            label: t('navbar.logout'),
             icon: 'pi pi-sign-out',
             command: () => {
               removeUser()
@@ -56,18 +57,33 @@ const menuItems = [
         ]
         : [
           {
-            label: 'Login',
+            label: t('navbar.login'),
             icon: 'pi pi-sign-in',
             command: () => navigateTo('/login')
           },
           {
-            label: 'Register',
+            label: t('navbar.register'),
             icon: 'pi pi-user-plus',
             command: () => navigateTo('/register')
           }
         ]
   }
 ]
+
+const languages = [
+  {
+    code: 'en',
+    label: 'English',
+  },
+  {
+    code: 'ro',
+    label: 'Română',
+  }
+]
+
+const onLanguageChange = (event: any) => {
+  setLocale(event.value);
+}
 
 </script>
 
@@ -84,7 +100,7 @@ const menuItems = [
         </InputIcon>
         <InputText
             v-model="search"
-            placeholder="Search..."
+            :placeholder="t('navbar.search')"
             class="rounded-pill md:w-96 lg:w-lg"
             @keyup.enter="onSearch"
         />
@@ -92,6 +108,15 @@ const menuItems = [
     </template>
 
     <template #end>
+      <Dropdown
+          v-model="locale"
+          :options="languages"
+          option-label="label"
+          option-value="code"
+          @change="onLanguageChange"
+          class="me-10"
+          style="width: 130px;"
+      />
       <Menubar :model="menuItems">
         <template #end>
           <template v-if="cartItems > 0">

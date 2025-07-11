@@ -8,6 +8,7 @@ const props = defineProps<{
 }>()
 
 const {user} = useUserStorage();
+const {t} = useI18n();
 const quantity = ref(1);
 
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
@@ -76,7 +77,7 @@ const onAddToCart = () => {
       </div>
       <div class="flex flex-col">
         <p class="text-2xl font-bold mb-4">
-          <span>Price: ${{ Math.floor(product.price) }}</span>
+          <span>{{ t('product.price') }}: ${{ Math.floor(product.price) }}</span>
           <span class="text-base align-middle">{{ (product.price % 1).toFixed(2).slice(1) }}</span>
         </p>
         <div class="mb-5">
@@ -88,7 +89,8 @@ const onAddToCart = () => {
               aria-label="Decrease quantity"
               type="button"
           />
-          <InputNumber :min="1" :max="product.availableQuantity" class="px-3 font-semibold text-lg" v-model="quantity" />
+          <InputNumber :min="1" :max="product.availableQuantity" class="px-3 font-semibold text-lg" input-class="w-12"
+                       v-model="quantity"/>
           <Button
               icon="pi pi-plus"
               class="p-button-rounded p-button-text"
@@ -100,19 +102,19 @@ const onAddToCart = () => {
         </div>
         <Toast/>
         <Button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2 mb-8"
-                icon="pi pi-shopping-cart" label="Add to Cart" @click="() => onAddToCart()"/>
-        <p class="text-2xl font-semibold my-4">Specifications</p>
+                icon="pi pi-shopping-cart" :label="t('product.addToCart')" @click="() => onAddToCart()"/>
+        <p class="text-2xl font-semibold my-4">{{ t('product.specifications') }}</p>
         <p class="text-lg mb-1" v-for="(spec) in product.attributes" :key="spec.id">
           <span class="font-semibold">{{ spec.name }}:</span> {{ spec.value }}
         </p>
       </div>
     </div>
-    <p class="text-2xl font-semibold my-4">Description</p>
+    <p class="text-2xl font-semibold my-4">{{ t('product.description') }}</p>
     <p class="text-lg mb-4">{{ product.description }}</p>
-<!--    <p class="text-2xl font-semibold my-4">Specifications</p>-->
-<!--    <p class="text-lg mb-1" v-for="(spec) in product.attributes" :key="spec.id">-->
-<!--      <span class="font-semibold">{{ spec.name }}:</span> {{ spec.value }}-->
-<!--    </p>-->
+    <!--    <p class="text-2xl font-semibold my-4">Specifications</p>-->
+    <!--    <p class="text-lg mb-1" v-for="(spec) in product.attributes" :key="spec.id">-->
+    <!--      <span class="font-semibold">{{ spec.name }}:</span> {{ spec.value }}-->
+    <!--    </p>-->
   </div>
 
 </template>
