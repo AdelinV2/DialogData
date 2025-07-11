@@ -6,6 +6,7 @@ import type {Address} from "~/types/address";
 import {navigateTo} from "#app";
 
 const {user} = useUserStorage();
+const {t} = useI18n();
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 
 onMounted(() => {
@@ -116,11 +117,11 @@ const confirmOrder = () => {
   <div class="flex flex-row gap-8 container mx-auto py-10 min-h-[calc(100vh-250px)]">
     <div class="flex-1">
       <Card class="mb-6">
-        <template #title>Delivery Address</template>
+        <template #title>{{ t('order.deliveryAddress') }}</template>
         <template #content>
           <div class="mb-3">
             <RadioButton v-model="useExistingDelivery" :value="true" inputId="existingDelivery"/>
-            <label for="existingDelivery" class="ml-2">Use existing address</label>
+            <label for="existingDelivery" class="ml-2">{{ t('order.useExistingAddress') }}</label>
           </div>
           <div v-if="useExistingDelivery && user" class="mb-4">
             <div class="p-3 border rounded bg-surface-100">
@@ -131,34 +132,34 @@ const confirmOrder = () => {
           </div>
           <div class="mb-3">
             <RadioButton v-model="useExistingDelivery" :value="false" inputId="newDelivery"/>
-            <label for="newDelivery" class="ml-2">Enter new address</label>
+            <label for="newDelivery" class="ml-2">{{ t('order.enterNewAddress') }}</label>
           </div>
           <div v-if="!useExistingDelivery">
             <div class="mb-2">
-              <InputText v-model="user.deliveryAddress.streetLine" placeholder="Street" class="w-full"/>
+              <InputText v-model="user.deliveryAddress.streetLine" :placeholder="t('register.street')" class="w-full"/>
             </div>
             <div class="mb-2 flex gap-2">
-              <InputText v-model="user.deliveryAddress.city" placeholder="City" class="w-1/2"/>
-              <InputText v-model="user.deliveryAddress.postalCode" placeholder="Postal Code" class="w-1/2"/>
+              <InputText v-model="user.deliveryAddress.city" :placeholder="t('register.city')" class="w-1/2"/>
+              <InputText v-model="user.deliveryAddress.postalCode" :placeholder="t('register.zip')" class="w-1/2"/>
             </div>
             <div class="mb-2">
-              <InputText v-model="user.deliveryAddress.country" placeholder="Country" class="w-full"/>
+              <InputText v-model="user.deliveryAddress.country" :placeholder="t('register.country')" class="w-full"/>
             </div>
           </div>
         </template>
       </Card>
 
       <Card>
-        <template #title>Billing Address</template>
+        <template #title>{{ t('order.billingAddress') }}</template>
         <template #content>
           <div class="mb-3">
             <Checkbox v-model="billingSameAsDelivery" :binary="true" inputId="sameAsDelivery"/>
-            <label for="sameAsDelivery" class="ml-2">Billing address same as delivery</label>
+            <label for="sameAsDelivery" class="ml-2">{{ t('register.billingSameAsDelivery')}}</label>
           </div>
           <div v-if="!billingSameAsDelivery">
             <div class="mb-3">
               <RadioButton v-model="useExistingBilling" :value="true" inputId="existingBilling"/>
-              <label for="existingBilling" class="ml-2">Use existing billing address</label>
+              <label for="existingBilling" class="ml-2">{{ t('order.useExistingAddress') }}</label>
             </div>
             <div v-if="useExistingBilling" class="mb-4">
               <div class="p-3 border rounded bg-surface-100">
@@ -169,18 +170,18 @@ const confirmOrder = () => {
             </div>
             <div class="mb-3">
               <RadioButton v-model="useExistingBilling" :value="false" inputId="newBilling"/>
-              <label for="newBilling" class="ml-2">Enter new billing address</label>
+              <label for="newBilling" class="ml-2">{{ t('order.enterNewAddress') }}</label>
             </div>
             <div v-if="!useExistingBilling && user">
               <div class="mb-2">
-                <InputText v-model="user.billingAddress.streetLine" placeholder="Street" class="w-full"/>
+                <InputText v-model="user.billingAddress.streetLine" :placeholder="t('register.street')" class="w-full"/>
               </div>
               <div class="mb-2 flex gap-2">
-                <InputText v-model="user.billingAddress.city" placeholder="City" class="w-1/2"/>
-                <InputText v-model="user.billingAddress.postalCode" placeholder="Postal Code" class="w-1/2"/>
+                <InputText v-model="user.billingAddress.city" :placeholder="t('register.city')" class="w-1/2"/>
+                <InputText v-model="user.billingAddress.postalCode" :placeholder="t('register.zip')" class="w-1/2"/>
               </div>
               <div class="mb-2">
-                <InputText v-model="user.billingAddress.country" placeholder="Country" class="w-full"/>
+                <InputText v-model="user.billingAddress.country" :placeholder="t('register.country')" class="w-full"/>
               </div>
             </div>
           </div>
@@ -189,18 +190,18 @@ const confirmOrder = () => {
     </div>
     <div class="w-96">
       <Card>
-        <template #title>Order Summary</template>
+        <template #title>{{ t('order.orderSummary') }}</template>
         <template #content>
           <div class="flex justify-between mb-2">
             <span class="font-bold">Total:</span>
             <span class="text-2xl font-bold">${{ cart?.totalPrice.toFixed(2) }}</span>
           </div>
           <div class="mb-4">
-            <label class="block mb-2 font-semibold">Payment Method</label>
+            <label class="block mb-2 font-semibold">{{t('order.paymentMethod')}}</label>
             <Dropdown v-model="selectedPayment" :options="paymentMethods" optionLabel="label" optionValue="value"
                       class="w-full"/>
           </div>
-          <Button label="Confirm Order" class="w-full" severity="primary" @click="confirmOrder" :disabled="cart?.cartEntries.length === 0"/>
+          <Button :label="t('order.confirmOrder')" class="w-full" severity="primary" @click="confirmOrder" :disabled="cart?.cartEntries.length === 0"/>
         </template>
       </Card>
     </div>

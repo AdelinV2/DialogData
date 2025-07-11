@@ -64,6 +64,7 @@
   },
   "order": {
     "order": "Order",
+    "orderSummary": "Order Summary",
     "myOrders": "My Orders",
     "orderDetails": "Order Details",
     "orderNumber": "Order Number",
@@ -81,6 +82,9 @@
     "pricePerPiece": "Price per Piece",
     "viewOrder": "View Order",
     "actions": "Actions",
-    "noOrders": "You have no orders yet."
+    "noOrders": "You have no orders yet.",
+    "useExistingAddress": "Use existing address",
+    "enterNewAddress": "Enter a new address",
+    "confirmOrder": "Confirm Order"
   }
 }

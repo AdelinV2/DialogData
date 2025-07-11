@@ -64,6 +64,7 @@
   },
   "order": {
     "order": "Comanda",
+    "orderSummary": "Rezumatul comenzii",
     "myOrders": "Comenzile mele",
     "orderDetails": "Detalii comandă",
     "orderNumber": "Număr comandă",
@@ -81,6 +82,9 @@
     "price": "Preț",
     "pricePerPiece": "Preț pe bucată",
     "actions": "Acțiuni",
-    "noOrders": "Nu ai comenzi."
+    "noOrders": "Nu ai comenzi.",
+    "useExistingAddress": "Folosește adresa existentă",
+    "enterNewAddress": "Introdu o adresă nouă",
+    "confirmOrder": "Confirmă comanda"
   }
 }

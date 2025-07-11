@@ -34,7 +34,7 @@ const fetchCart = () => {
 const onQuantityChange = (event: any) => {
 
   const entry = cartEntries.value[event.index];
-  entry.quantity = event.value;
+  // entry.quantity = event.value;
 
   if (entry.product && entry.product.id) {
     $fetch(`${apiBaseUrl}/cart/update`, {
@@ -186,8 +186,14 @@ const getStockName = (product: Product) => {
                           aria-label="Decrease quantity"
                           type="button"
                       />
-                      <InputNumber :min="1" :max="entry.quantity" class="px-3 font-semibold text-lg" input-class="w-15"
-                                   v-model="entry.quantity"/>
+                      <InputNumber
+                        :min="1"
+                        :max="entry.product && entry.product.id && products[entry.product.id]?.availableQuantity"
+                        class="px-3 font-semibold text-lg"
+                        input-class="w-15"
+                        v-model="entry.quantity"
+                        @update:modelValue="value => onQuantityChange({ index, value })"
+                      />
                       <Button
                           icon="pi pi-plus"
                           class="p-button-rounded p-button-text"
@@ -227,7 +233,7 @@ const getStockName = (product: Product) => {
           <div class="flex items-center justify-between">
             <span class="font-bold">Total:</span>
             <span class="text-2xl font-bold">
-              ${{cartEntries.reduce((total, entry) => total + (entry.pricePerPiece * entry.quantity), 0).toFixed(2) }}
+              ${{ cartEntries.reduce((total, entry) => total + (entry.pricePerPiece * entry.quantity), 0).toFixed(2) }}
             </span>
           </div>
         </div>

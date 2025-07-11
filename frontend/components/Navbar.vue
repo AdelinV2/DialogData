@@ -83,6 +83,9 @@ const languages = [
 
 const onLanguageChange = (event: any) => {
   setLocale(event.value);
+  setTimeout(() => {
+    window.location.reload();
+  }, 100);
 }
 
 </script>
