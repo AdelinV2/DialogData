@@ -39,7 +39,11 @@
     "register": "Înregistrare",
     "editProfile": "Editează profilul",
     "orders": "Comenzile mele",
-    "search": "Căutare..."
+    "search": "Căutare...",
+    "newestFirst": "Cele mai noi întâi",
+    "oldestFirst": "Cele mai vechi întâi",
+    "priceLowToHigh": "Preț: Mic la Mare",
+    "priceHighToLow": "Preț: Mare la Mic"
   },
   "product": {
     "addToCart": "Adaugă în coș",
@@ -53,7 +57,10 @@
     "description": "Descriere",
     "specifications": "Specificații",
     "addedToCart": "Produsul a fost adăugat în coș.",
-    "failedToAdd": "Nu s-a putut adăuga produsul în coș."
+    "failedToAdd": "Nu s-a putut adăuga produsul în coș.",
+    "buyNow": "Cumpără acum",
+    "name": "Nume",
+    "value": "Valoare"
   },
   "resetPassword": {
     "resetPassword": "Resetează parola",

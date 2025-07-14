@@ -34,7 +34,7 @@ const fetchCart = () => {
 const onQuantityChange = (event: any) => {
 
   const entry = cartEntries.value[event.index];
-  // entry.quantity = event.value;
+  entry.quantity = event.value;
 
   if (entry.product && entry.product.id) {
     $fetch(`${apiBaseUrl}/cart/update`, {
@@ -168,15 +168,15 @@ const getStockName = (product: Product) => {
                     </div>
                   </div>
                   <div class="flex flex-col md:items-end gap-8">
-                              <span class="text-2xl font-bold">
-                                <span v-if="entry.product && entry.product.id && products[entry.product.id]">${{
-                                    Math.floor(products[entry.product.id].price)
-                                  }}</span>
-                                <span v-if="entry.product && entry.product.id && products[entry.product.id]"
+                    <span class="text-2xl font-bold">
+                      <span v-if="entry.product && entry.product.id && products[entry.product.id]">
+                        ${{ Math.floor(products[entry.product.id].price) }}
+                      </span>
+                      <span v-if="entry.product && entry.product.id && products[entry.product.id]"
                                       class="text-base align-middle">
-                                  {{ (products[entry.product.id].price % 1).toFixed(2).slice(1) }}
-                                </span>
-                              </span>
+                        {{ (products[entry.product.id].price % 1).toFixed(2).slice(1) }}
+                      </span>
+                    </span>
                     <div class="flex items-center mt-2">
                       <Button
                           icon="pi pi-minus"
@@ -187,12 +187,12 @@ const getStockName = (product: Product) => {
                           type="button"
                       />
                       <InputNumber
-                        :min="1"
-                        :max="entry.product && entry.product.id && products[entry.product.id]?.availableQuantity"
-                        class="px-3 font-semibold text-lg"
-                        input-class="w-15"
-                        v-model="entry.quantity"
-                        @update:modelValue="value => onQuantityChange({ index, value })"
+                          :min="1"
+                          :max="entry.product && entry.product.id && products[entry.product.id]?.availableQuantity"
+                          class="px-3 font-semibold text-lg"
+                          input-class="w-15"
+                          v-model="entry.quantity"
+                          @update:modelValue="value => onQuantityChange({ index, value })"
                       />
                       <Button
                           icon="pi pi-plus"
@@ -223,10 +223,10 @@ const getStockName = (product: Product) => {
       <template #content>
         <div class="flex flex-col gap-4">
           <div v-for="(entry, index) in cartEntries" :key="entry.id" class="flex items-center justify-between">
-                      <span>
-                        {{ entry.product && entry.product.id && products[entry.product.id]?.name || 'Product' }} <span
-                          class="font-bold"> ({{ entry.quantity }}) </span>
-                      </span>
+            <span>
+              {{ entry.product && entry.product.id && products[entry.product.id]?.name || 'Product' }}
+              <span class="font-bold"> ({{ entry.quantity }}) </span>
+            </span>
             <span>${{ (entry.pricePerPiece * entry.quantity).toFixed(2) }}</span>
           </div>
           <hr class="my-4"/>

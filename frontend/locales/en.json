@@ -39,7 +39,11 @@
     "register": "Register",
     "editProfile": "Edit Profile",
     "orders": "My Orders",
-    "search": "Search..."
+    "search": "Search...",
+    "newestFirst": "Newest First",
+    "oldestFirst": "Oldest First",
+    "priceLowToHigh": "Price: Low to High",
+    "priceHighToLow": "Price: High to Low"
   },
   "product": {
     "addToCart": "Add to Cart",
@@ -53,7 +57,10 @@
     "description": "Description",
     "specifications": "Specifications",
     "addedToCart": "Product added to cart.",
-    "failedToAdd": "Failed to add product to cart."
+    "failedToAdd": "Failed to add product to cart.",
+    "buyNow": "Buy Now",
+    "name": "Name",
+    "value": "Value"
   },
   "resetPassword": {
     "resetPassword": "Reset Password",

@@ -40,6 +40,66 @@ function handleImageChange(event: Event) {
   });
 }
 
+const files = ref<File[]>([]);
+const uploadedFiles = ref<File[]>([]);
+
+function onSelectedFiles(event: any) {
+  files.value = event.files.map((file: File) => {
+    (file as any).objectURL = URL.createObjectURL(file);
+    return file;
+  });
+}
+
+function uploadEvent(callback: Function) {
+  files.value.forEach((file: File, idx: number) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      product.value.images.push({
+        base64: reader.result as string,
+        fileName: file.name,
+        imageUrl: '',
+      });
+      (file as any).objectURL = (file as any).objectURL || URL.createObjectURL(file);
+      uploadedFiles.value.push(file);
+      if (idx === files.value.length - 1) {
+        files.value = [];
+        callback();
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function onTemplatedUpload() {
+  toast.add({severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000});
+}
+
+function formatSize(bytes: number) {
+  const k = 1024;
+  const dm = 2;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  if (bytes === 0) return `0 ${sizes[0]}`;
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
+
+function onRemoveTemplatingFile(file: File, removeFileCallback: Function, index: number) {
+  removeFileCallback(index);
+  files.value = files.value.filter((f, i) => i !== index);
+  if ((file as any).objectURL) {
+    URL.revokeObjectURL((file as any).objectURL);
+  }
+}
+
+function removeUploadedFileCallback(index: number) {
+  const file = uploadedFiles.value[index];
+  if ((file as any).objectURL) {
+    URL.revokeObjectURL((file as any).objectURL);
+  }
+  uploadedFiles.value.splice(index, 1);
+  product.value.images.splice(index, 1);
+}
+
 $fetch(`${apiBaseUrl}/category`, {
   method: 'GET',
   onResponse({response}) {
@@ -115,14 +175,14 @@ function addAttribute() {
     });
     return;
   }
-  product.value.attributes.push({ name: newName, value: '' });
+  product.value.attributes.push({name: newName, value: ''});
 }
 
 </script>
 
 <template>
 
-  <Toast />
+  <Toast/>
   <Card class="mt-8 mb-14" style="width: 600px; justify-self: center;">
     <template #title>
       Add Product
@@ -216,26 +276,103 @@ function addAttribute() {
         </InputGroup>
 
         <InputGroup>
-          <InputGroupAddon>
-            <i class="pi pi-image"></i>
-          </InputGroupAddon>
-          <FloatLabel variant="on">
-            <input
-                id="imageUrls"
-                type="file"
-                multiple
-                @change="handleImageChange"
-                class="p-inputtext p-component w-full"
-            />
-          </FloatLabel>
+          <div class="card w-full">
+            <Toast/>
+            <FileUpload name="demo[]" url="/api/upload" @upload="onTemplatedUpload" :multiple="true" accept="image/*"
+                        @select="onSelectedFiles">
+              <template #header="{ chooseCallback, uploadCallback, clearCallback, files }">
+                <div class="flex flex-wrap justify-between items-center flex-1 gap-4">
+                  <div class="flex gap-2">
+                    <Button @click="chooseCallback()" icon="pi pi-images" rounded outlined
+                            severity="secondary"></Button>
+                    <Button @click="uploadEvent(uploadCallback)" icon="pi pi-cloud-upload" rounded outlined
+                            severity="success" :disabled="!files || files.length === 0"></Button>
+                    <Button @click="clearCallback()" icon="pi pi-times" rounded outlined severity="danger"
+                            :disabled="!files || files.length === 0"></Button>
+                  </div>
+                </div>
+              </template>
+              <template #content="{ removeFileCallback }">
+                <div class="flex flex-col gap-8 pt-4">
+                  <div v-if="files.length > 0">
+                    <h5>Pending</h5>
+                    <div class="flex flex-wrap gap-4">
+                      <div
+                          v-for="(file, index) in files"
+                          :key="file.name + file.type + file.size"
+                          class="p-8 rounded-border flex flex-col border border-surface items-center gap-4"
+                      >
+                        <img
+                            role="presentation"
+                            :alt="file.name"
+                            :src="(file as any).objectURL"
+                            width="100"
+                            height="50"
+                        />
+                        <span class="font-semibold text-ellipsis max-w-60 whitespace-nowrap overflow-hidden">
+                          {{ file.name }}
+                        </span>
+                        <div>{{ formatSize(file.size) }}</div>
+                        <Badge value="Pending" severity="warn"/>
+                        <Button
+                            icon="pi pi-times"
+                            @click="onRemoveTemplatingFile(file, removeFileCallback, index)"
+                            outlined
+                            rounded
+                            severity="danger"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div v-if="uploadedFiles.length > 0">
+                    <h5>Completed</h5>
+                    <div class="flex flex-wrap gap-4">
+                      <div
+                          v-for="(file, index) in uploadedFiles"
+                          :key="file.name + file.type + file.size"
+                          class="p-8 rounded-border flex flex-col border border-surface items-center gap-4"
+                      >
+                        <img
+                            role="presentation"
+                            :alt="file.name"
+                            :src="product.images[index]?.base64"
+                            width="100"
+                            height="50"
+                        />
+                        <span class="font-semibold text-ellipsis max-w-60 whitespace-nowrap overflow-hidden">
+                          {{ file.name }}
+                        </span>
+                        <div>{{ formatSize(file.size) }}</div>
+                        <Badge value="Completed" severity="success"/>
+                        <Button
+                            icon="pi pi-times"
+                            @click="removeUploadedFileCallback(index)"
+                            outlined
+                            rounded
+                            severity="danger"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <template #empty>
+                <div class="flex items-center justify-center flex-col">
+                  <i class="pi pi-cloud-upload !border-2 !rounded-full !p-8 !text-4xl !text-muted-color"/>
+                  <p class="mt-6 mb-0">Drag and drop files to here to upload.</p>
+                </div>
+              </template>
+            </FileUpload>
+          </div>
         </InputGroup>
       </div>
       <Button label="Submit" class="w-full mt-5" @click="onSubmit"
-              :disabled="!product.name || !product.description || product.price <= 0 || !product.addedDate || !product.category || product.attributes.length === 0 || product.images?.length === 0" />
+              :disabled="!product.name || !product.description || product.price <= 0 || !product.addedDate || !product.category || product.attributes.length === 0 || product.images?.length === 0"/>
     </template>
   </Card>
 
-  <ProductDetails :product="product"/>
+  <ProductDetails2 :product="product"/>
 
 </template>
 

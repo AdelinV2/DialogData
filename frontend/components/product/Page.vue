@@ -1,19 +1,53 @@
 <script setup lang="ts">
-import type { Product } from '~/types/product'
+import type {Product} from '~/types/product'
+import {ref} from "vue";
 
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl
 
 const {t} = useI18n()
 const products = ref<Product[]>([])
-const pageInfo = ref({ page: 0, size: 12, totalElements: 0, totalPages: 0 })
-const sort = ref({ by: 'addedDate', order: 'desc' })
+const pageInfo = ref({page: 0, size: 12, totalElements: 0, totalPages: 0})
+const sort = ref({by: 'addedDate', order: 'desc'})
 
 const sortOptions = [
-  { label: 'Newest First', value: { by: 'addedDate', order: 'desc' } },
-  { label: 'Oldest First', value: { by: 'addedDate', order: 'asc' } },
-  { label: 'Price High to Low', value: { by: 'price', order: 'desc' } },
-  { label: 'Price Low to High', value: { by: 'price', order: 'asc' } }
+  {label: t('navbar.newestFirst'), value: {by: 'addedDate', order: 'desc'}},
+  {label: t('navbar.oldestFirst'), value: {by: 'addedDate', order: 'asc'}},
+  {label: t('navbar.priceHighToLow'), value: {by: 'price', order: 'desc'}},
+  {label: t('navbar.priceLowToHigh'), value: {by: 'price', order: 'asc'}}
 ]
+
+const responsiveOptions = ref([
+  {
+    breakpoint: '991px',
+    numVisible: 4
+  },
+  {
+    breakpoint: '767px',
+    numVisible: 3
+  },
+  {
+    breakpoint: '575px',
+    numVisible: 1
+  }
+]);
+
+const headerImages = ref([
+{
+  itemImageSrc: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=2400&q=80',
+  alt: 'Ultrawide Desert',
+  thumbnailImageSrc: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80'
+},
+{
+  itemImageSrc: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2400&q=80',
+  alt: 'Ultrawide Forest',
+  thumbnailImageSrc: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80'
+},
+{
+  itemImageSrc: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2400&q=80',
+  alt: 'Ultrawide Lake',
+  thumbnailImageSrc: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=400&q=80'
+}
+])
 
 const selectedCategory = ref<number | null>(null)
 const searchTerm = ref('')
@@ -31,7 +65,7 @@ const fetchProducts = () => {
   const res = $fetch(`${apiBaseUrl}/products`, {
     method: 'GET',
     params: params,
-    onResponse({ response }) {
+    onResponse({response}) {
       if (response.status === 200) {
 
         products.value = response._data.content as Product[];
@@ -40,8 +74,7 @@ const fetchProducts = () => {
         isLoading.value = false
 
         console.log('Products fetched successfully:', products.value)
-      }
-      else {
+      } else {
         console.error('Failed to fetch products')
       }
     },
@@ -49,16 +82,16 @@ const fetchProducts = () => {
 }
 
 watch(
-  [
-    () => pageInfo.value.page,
-    () => pageInfo.value.size,
-    () => sort.value.by,
-    () => sort.value.order,
-    selectedCategory,
-    searchTerm,
-  ],
-  fetchProducts,
-  { immediate: true }
+    [
+      () => pageInfo.value.page,
+      () => pageInfo.value.size,
+      () => sort.value.by,
+      () => sort.value.order,
+      selectedCategory,
+      searchTerm,
+    ],
+    fetchProducts,
+    {immediate: true}
 )
 
 const onSortChange = (newSort: { by: string, order: string }) => {
@@ -90,27 +123,47 @@ onMounted(() => {
 </script>
 
 <template>
-  <Navbar @search="onSearch" />
+  <Navbar @search="onSearch"/>
 
-  <div class="flex mt-6 min-h-[calc(100vh-330px)]">
-    <div class="flex-none me-10">
-      <ProductCategories @category-selected="onCategorySelected" />
+
+  <div class="container mx-auto min-h-[calc(100vh-330px)]">
+    <div class="flex mt-6 mb-10">
+      <div style="min-width: 180px;">
+        <ProductCategories @category-selected="onCategorySelected" class="flex-1 h-full"/>
+      </div>
+      <div class="flex-1 flex justify-center">
+      <div class="card">
+        <Galleria :value="headerImages" :responsiveOptions="responsiveOptions" :numVisible="5" :circular="true"
+                  containerStyle="width: 640px" :auto-play="true" :transition-interval="5000"
+                  :showItemNavigators="true" :showThumbnails="false" :showItemNavigatorsOnHover="true"
+                  :showIndicators="true">
+          <template #item="slotProps">
+            <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block;"/>
+          </template>
+          <template #thumbnail="slotProps">
+            <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block;"/>
+          </template>
+        </Galleria>
+      </div>
     </div>
+    </div>
+
+
     <div class="flex-auto me-5">
-      <ProductList :rows="pageInfo.size" :loading="isLoading" :products="products" :sort="sort" :sortOptions="sortOptions" @sort-change="onSortChange" />
+      <ProductList :rows="pageInfo.size" :loading="isLoading" :products="products" :sort="sort"
+                   :sortOptions="sortOptions" @sort-change="onSortChange"/>
     </div>
   </div>
-
   <div class="card mt-12">
     <Paginator
-      :rows="pageInfo.size"
-      :totalRecords="pageInfo.totalElements"
-      :rowsPerPageOptions="[12,24,36]"
-      :first="pageInfo.page * pageInfo.size"
-      @page="onPageChange"
+        :rows="pageInfo.size"
+        :totalRecords="pageInfo.totalElements"
+        :rowsPerPageOptions="[12,24,36]"
+        :first="pageInfo.page * pageInfo.size"
+        @page="onPageChange"
     />
   </div>
-  <Footer />
+  <Footer/>
 </template>
 
 <style scoped>
