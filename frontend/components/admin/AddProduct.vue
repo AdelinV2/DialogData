@@ -4,6 +4,7 @@ import type {Attribute} from "~/types/attribute";
 import type {Category} from "~/types/category";
 import type {Product} from "~/types/product";
 import type {Image} from "~/types/image";
+import type {AttributeValue} from "~/types/attributeValue";
 
 
 const product = ref<Product>({
@@ -12,7 +13,7 @@ const product = ref<Product>({
   price: 0.0,
   availableQuantity: 0,
   addedDate: new Date(),
-  attributes: [] as Attribute[],
+  attributes: [] as AttributeValue[],
   category: {} as Category,
   images: [] as Image[],
 })
@@ -145,7 +146,7 @@ function onSubmit() {
           price: 0,
           availableQuantity: 0,
           addedDate: new Date(),
-          attributes: [] as Attribute[],
+          attributes: [] as AttributeValue[],
           category: {} as Category,
           images: [] as Image[],
         };
@@ -166,7 +167,7 @@ function onSubmit() {
 
 function addAttribute() {
   const newName = '';
-  if (product.value.attributes.some(attr => attr.name === newName)) {
+  if (product.value.attributes.some(attr => attr.attribute.name === newName)) {
     toast.add({
       severity: 'error',
       summary: 'Duplicate Attribute',
@@ -175,7 +176,12 @@ function addAttribute() {
     });
     return;
   }
-  product.value.attributes.push({name: newName, value: ''});
+  product.value.attributes.push({
+    attribute: {
+      name: newName,
+    },
+    value: '',
+  });
 }
 
 </script>
@@ -243,7 +249,7 @@ function addAttribute() {
           <div v-for="(attr, index) in product.attributes" :key="index" class="flex gap-2 mb-2">
             <InputText
                 :id="`attribute-name-${index}`"
-                v-model="attr.name"
+                v-model="attr.attribute.name"
                 placeholder="Name"
                 class="w-1/2"
             />

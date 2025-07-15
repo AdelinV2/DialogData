@@ -168,7 +168,7 @@ const getStockLabel = () => {
           <AccordionContent>
             <div class="card">
               <DataTable :value="props.product.attributes" stripedRows tableStyle="min-width: 50rem">
-                <Column field="name" :header="t('product.name')"></Column>
+                <Column field="attribute.name" :header="t('product.name')"></Column>
                 <Column field="value" :header="t('product.value')"></Column>
               </DataTable>
             </div>

@@ -60,7 +60,9 @@
     "failedToAdd": "Nu s-a putut adăuga produsul în coș.",
     "buyNow": "Cumpără acum",
     "name": "Nume",
-    "value": "Valoare"
+    "value": "Valoare",
+    "shoppingCart": "Coș de cumpărături",
+    "checkout": "Finalizare comandă"
   },
   "resetPassword": {
     "resetPassword": "Resetează parola",

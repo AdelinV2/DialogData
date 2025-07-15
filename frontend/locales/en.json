@@ -60,7 +60,9 @@
     "failedToAdd": "Failed to add product to cart.",
     "buyNow": "Buy Now",
     "name": "Name",
-    "value": "Value"
+    "value": "Value",
+    "shoppingCart": "Shopping Cart",
+    "checkout": "Checkout"
   },
   "resetPassword": {
     "resetPassword": "Reset Password",

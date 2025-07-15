@@ -35,7 +35,7 @@ public class ProductDto implements Serializable {
 
     LocalDate addedDate;
 
-    List<ProductAttributeDto> attributes;
+    List<ProductAttributeValueDto> attributes;
 
     CategoryDto category;
 

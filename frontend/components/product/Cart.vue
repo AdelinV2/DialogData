@@ -8,6 +8,7 @@ const products = ref({} as Record<number, Product>);
 const cartEntries = ref([] as CartEntry[]);
 const {user} = useUserStorage();
 const toast = useToast();
+const {t} = useI18n();
 
 onMounted(() => {
   if (!user.value) {
@@ -125,11 +126,11 @@ const getSeverity = (product: Product) => {
 
 const getStockName = (product: Product) => {
   if (product.availableQuantity > 5) {
-    return 'In Stock';
+    return t('product.inStock');
   } else if (product.availableQuantity > 0) {
-    return 'Low Stock';
+    return t('product.limitedStock');
   } else {
-    return 'Out of Stock';
+    return t('product.outOfStock');
   }
 };
 </script>
@@ -219,7 +220,7 @@ const getStockName = (product: Product) => {
       </DataView>
     </div>
     <Card class="w-96 ms-5">
-      <template #title>Shopping Cart</template>
+      <template #title>{{ t('product.shoppingCart') }}</template>
       <template #content>
         <div class="flex flex-col gap-4">
           <div v-for="(entry, index) in cartEntries" :key="entry.id" class="flex items-center justify-between">
@@ -237,7 +238,7 @@ const getStockName = (product: Product) => {
             </span>
           </div>
         </div>
-        <Button label="Checkout" class="mt-4 w-full" severity="primary" @click="() => navigateTo('/checkout')"
+        <Button :label="t('product.checkout')" class="mt-4 w-full" severity="primary" @click="() => navigateTo('/checkout')"
                 :disabled="cartEntries.length === 0"/>
       </template>
     </Card>

@@ -3,15 +3,17 @@ package com.dialogdata.main.service;
 import com.dialogdata.main.client.ImageClient;
 import com.dialogdata.main.dto.CategoryDto;
 import com.dialogdata.main.dto.ImageDto;
+import com.dialogdata.main.dto.ProductAttributeValueDto;
 import com.dialogdata.main.dto.ProductDto;
 import com.dialogdata.main.entity.Product;
 import com.dialogdata.main.entity.ProductAttribute;
+import com.dialogdata.main.entity.ProductAttributeValue;
 import com.dialogdata.main.mapper.CategoryMapper;
 import com.dialogdata.main.mapper.ProductAttributeMapper;
+import com.dialogdata.main.mapper.ProductAttributeValueMapper;
 import com.dialogdata.main.mapper.ProductMapper;
 import com.dialogdata.main.repository.ProductRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,11 +28,12 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryProductListService categoryProductListService;
     private final CategoryService categoryService;
-    private final ProductAttributeListService productAttributeListService;
+    private final ProductAttributeValueService productAttributeValueService;
     private final ProductAttributeService productAttributeService;
     private final ProductMapper productMapper;
     private final CategoryMapper categoryMapper;
     private final ProductAttributeMapper productAttributeMapper;
+    private final ProductAttributeValueMapper productAttributeValueMapper;
     private final ImageClient imageClient;
 
     public ProductDto findProductDtoById(Integer id) {
@@ -41,11 +44,11 @@ public class ProductService {
             return null;
         }
 
-        List<ProductAttribute> attributes = productAttributeListService.findByProductId(id);
+        List<ProductAttributeValue> attributes = productAttributeValueService.findByProductId(id);
         CategoryDto category = categoryMapper.toDto(categoryService.findCategoryByProductId(id));
 
         ProductDto productDto = productMapper.toDto(product);
-        productDto.setAttributes(productAttributeMapper.toDtoList(attributes));
+        productDto.setAttributes(productAttributeValueMapper.toDtoList(attributes));
         productDto.setCategory(category);
 
         return productDto;
@@ -61,14 +64,16 @@ public class ProductService {
         Product createdProduct = productRepository.save(productMapper.toEntity(productDto));
 
         categoryProductListService.createCategoryProductList(categoryMapper.toEntity(productDto.getCategory()), createdProduct);
-        for (ProductAttribute attribute : productAttributeMapper.toEntityList(productDto.getAttributes())) {
-            ProductAttribute savedAttribute = productAttributeService.create(attribute);
-            productAttributeListService.create(savedAttribute, createdProduct);
+        for (ProductAttributeValueDto attribute : productDto.getAttributes()) {
+            attribute.setProduct(productMapper.toDto(createdProduct));
+            ProductAttribute savedAttribute = productAttributeService.create(productAttributeMapper.toEntity(attribute.getAttribute()));
+            attribute.setAttribute(productAttributeMapper.toDto(savedAttribute));
+            productAttributeValueService.create(attribute);
         }
 
         ProductDto createdProductDto = productMapper.toDto(createdProduct);
         createdProductDto.setCategory(categoryMapper.toDto(categoryService.findCategoryByProductId(createdProduct.getId())));
-        createdProductDto.setAttributes(productAttributeMapper.toDtoList(productAttributeListService.findByProductId(createdProduct.getId())));
+        createdProductDto.setAttributes(productAttributeValueMapper.toDtoList(productAttributeValueService.findByProductId(createdProduct.getId())));
 
         for (ImageDto image : productDto.getImages()) {
             image.setFileName(createdProductDto.getId() + "_" + image.getFileName());
@@ -113,19 +118,6 @@ public class ProductService {
         return productRepository.save(entity);
     }
 
-    public Page<Product> getProductsByCategoryIdAndSearch(Pageable pageable, Integer categoryId, String search) {
-
-        if (categoryId != null && search != null && !search.isEmpty()) {
-            return productRepository.findAllByCategoryIdAndNameContainingIgnoreCase(categoryId, search, pageable);
-        } else if (categoryId != null) {
-            return productRepository.findAllByCategoryId(categoryId, pageable);
-        } else if (search != null && !search.isEmpty()) {
-            return productRepository.findAllByNameContainingIgnoreCase(search, pageable);
-        } else {
-            return productRepository.findAll(pageable);
-        }
-    }
-
     public List<ImageDto> getProductImagesByProductId(Integer productId) {
 
         List<String> imageUrls = imageClient.getProductImagesUrl(productId);
@@ -150,5 +142,21 @@ public class ProductService {
         } else {
             throw new IllegalArgumentException("Product not found with ID: " + id);
         }
+    }
+
+    public Page<Product> getProductsByCategoryIdAndSearchAndAttribute(Pageable pageable, Integer categoryId, String search, List<String> attributeValue) {
+
+//        if (categoryId != null && search != null && !search.isEmpty() && !attributeValue.isEmpty()) {
+//            return productRepository.findAllByCategoryIdAndNameContainingIgnoreCaseAndAttributeValue(categoryId, search, attributeValue, pageable);
+//        } else if (categoryId != null && search != null && !search.isEmpty()) {
+//            return productRepository.findAllByCategoryIdAndNameContainingIgnoreCase(categoryId, search, pageable);
+//        } else if (categoryId != null) {
+//            return productRepository.findAllByCategoryId(categoryId, pageable);
+//        } else if (search != null && !search.isEmpty()) {
+//            return productRepository.findAllByNameContainingIgnoreCase(search, pageable);
+//        } else {
+//            return productRepository.findAll(pageable);
+//        }
+        return productRepository.findAllByCategoryIdAndNameContainingIgnoreCaseAndAttributeValue(categoryId, search, attributeValue, pageable);
     }
 }

@@ -14,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
@@ -59,9 +61,12 @@ public class ProductController {
             @Parameter(description = "Search query for products", required = false)
             @RequestParam(value = "search", required = false) String search,
             @Parameter(description = "Category ID to filter products", required = false)
-            @RequestParam(value = "categoryId", required = false) Integer categoryId) {
+            @RequestParam(value = "categoryId", required = false) Integer categoryId,
+            @Parameter(description = "Attribute value to filter products", required = false)
+            @RequestParam(value = "attributeValue", required = false) List<String> attributeValue
+    ) {
 
-        Page<Product> products = productService.getProductsByCategoryIdAndSearch(pageable, categoryId, search);
+        Page<Product> products = productService.getProductsByCategoryIdAndSearchAndAttribute(pageable, categoryId, search, attributeValue);
 
         Page<ProductDto> productDtos = products.map(product -> {
             ProductDto dto = productMapper.toDto(product);

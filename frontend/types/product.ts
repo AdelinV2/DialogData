@@ -1,6 +1,6 @@
-import type {Attribute} from "~/types/attribute";
 import type {Category} from "~/types/category";
 import type {Image} from "~/types/image";
+import type {AttributeValue} from "~/types/attributeValue";
 
 export interface Product {
     id?: number,
@@ -9,7 +9,7 @@ export interface Product {
     price: number,
     availableQuantity: number,
     addedDate: Date,
-    attributes: Attribute[],
+    attributes: AttributeValue[],
     category: Category,
     images: Image[],
 }

@@ -5,6 +5,7 @@ import {ref} from "vue";
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl
 
 const {t} = useI18n()
+const {attributeValue} = useAttributeValue()
 const products = ref<Product[]>([])
 const pageInfo = ref({page: 0, size: 12, totalElements: 0, totalPages: 0})
 const sort = ref({by: 'addedDate', order: 'desc'})
@@ -32,21 +33,21 @@ const responsiveOptions = ref([
 ]);
 
 const headerImages = ref([
-{
-  itemImageSrc: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=2400&q=80',
-  alt: 'Ultrawide Desert',
-  thumbnailImageSrc: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80'
-},
-{
-  itemImageSrc: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2400&q=80',
-  alt: 'Ultrawide Forest',
-  thumbnailImageSrc: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80'
-},
-{
-  itemImageSrc: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2400&q=80',
-  alt: 'Ultrawide Lake',
-  thumbnailImageSrc: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=400&q=80'
-}
+  {
+    itemImageSrc: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=2400&q=80',
+    alt: 'Ultrawide Desert',
+    thumbnailImageSrc: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80'
+  },
+  {
+    itemImageSrc: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2400&q=80',
+    alt: 'Ultrawide Forest',
+    thumbnailImageSrc: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80'
+  },
+  {
+    itemImageSrc: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2400&q=80',
+    alt: 'Ultrawide Lake',
+    thumbnailImageSrc: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=400&q=80'
+  }
 ])
 
 const selectedCategory = ref<number | null>(null)
@@ -61,6 +62,9 @@ const fetchProducts = () => {
 
   if (selectedCategory.value) params.categoryId = selectedCategory.value
   if (searchTerm.value) params.search = searchTerm.value
+  if (attributeValue.value.length > 0) {
+    params.attributeValue = attributeValue.value.map(av => av.value);
+  }
 
   const res = $fetch(`${apiBaseUrl}/products`, {
     method: 'GET',
@@ -92,6 +96,18 @@ watch(
     ],
     fetchProducts,
     {immediate: true}
+)
+
+// watch(
+//   () => attributeValue.value,
+//   fetchProducts,
+//   { immediate: true, deep: true }
+// );
+
+watch(
+    attributeValue,
+    fetchProducts,
+    { immediate: true, deep: true }
 )
 
 const onSortChange = (newSort: { by: string, order: string }) => {
@@ -132,20 +148,20 @@ onMounted(() => {
         <ProductCategories @category-selected="onCategorySelected" class="flex-1 h-full"/>
       </div>
       <div class="flex-1 flex justify-center">
-      <div class="card">
-        <Galleria :value="headerImages" :responsiveOptions="responsiveOptions" :numVisible="5" :circular="true"
-                  containerStyle="width: 640px" :auto-play="true" :transition-interval="5000"
-                  :showItemNavigators="true" :showThumbnails="false" :showItemNavigatorsOnHover="true"
-                  :showIndicators="true">
-          <template #item="slotProps">
-            <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block;"/>
-          </template>
-          <template #thumbnail="slotProps">
-            <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block;"/>
-          </template>
-        </Galleria>
+        <div class="card">
+          <Galleria :value="headerImages" :responsiveOptions="responsiveOptions" :numVisible="5" :circular="true"
+                    containerStyle="width: 640px" :auto-play="true" :transition-interval="5000"
+                    :showItemNavigators="true" :showThumbnails="false" :showItemNavigatorsOnHover="true"
+                    :showIndicators="true">
+            <template #item="slotProps">
+              <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" style="width: 100%; display: block;"/>
+            </template>
+            <template #thumbnail="slotProps">
+              <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block;"/>
+            </template>
+          </Galleria>
+        </div>
       </div>
-    </div>
     </div>
 
 

@@ -90,6 +90,7 @@ const addToCart = (product: Product) => {
               optionValue="value"
               placeholder="Newest First"
           />
+          <ProductAttributes />
           <div class="flex justify-end">
             <SelectButton v-model="layout" :options="options" :allowEmpty="false">
               <template #option="{ option }">

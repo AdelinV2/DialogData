@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/product-attribute")
@@ -85,5 +87,16 @@ public class ProductAttributeController {
         }
 
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Get all product attributes")
+    @ApiResponse(responseCode = "200", description = "List of product attributes retrieved successfully")
+    @GetMapping
+    public ResponseEntity<List<ProductAttributeDto>> getAllProductAttributes() {
+
+        List<ProductAttribute> productAttributes = productAttributeService.findAllAndDistinct();
+        List<ProductAttributeDto> productAttributeDtos = productAttributeMapper.toDtoList(productAttributes);
+
+        return ResponseEntity.ok(productAttributeDtos);
     }
 }

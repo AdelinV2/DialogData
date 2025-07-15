@@ -24,10 +24,5 @@ public class ProductAttribute {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @Size(max = 255)
-    @NotNull
-    @Column(name = "value", nullable = false)
-    private String value;
-
 
 }
