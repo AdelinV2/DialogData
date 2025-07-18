@@ -1,8 +1,10 @@
 package com.dialogdata.main.entity;
 
+import com.dialogdata.main.util.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -57,5 +59,16 @@ public class User {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "billing_address_id", nullable = false)
     private Address billingAddress;
+
+    @NotNull
+    @Column(name = "subscribed", nullable = false)
+    @ColumnDefault(value = "false")
+    private Boolean subscribed = false;
+
+    @NotNull
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+    @ColumnDefault(value = "0")
+    private Role role = Role.USER;
 
 }

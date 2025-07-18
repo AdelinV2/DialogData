@@ -13,6 +13,7 @@ import java.io.Serializable;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ProductAttributeValueDto implements Serializable {
 
     Integer id;

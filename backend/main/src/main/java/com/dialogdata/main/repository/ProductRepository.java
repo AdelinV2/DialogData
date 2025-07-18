@@ -22,8 +22,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     Page<Product> findAllByNameContainingIgnoreCase(String search, Pageable pageable);
 
-    @Query("SELECT DISTINCT p FROM Product p JOIN CategoryProductList c ON p.id = c.product.id " +
-            "JOIN ProductAttributeValue pav ON p.id = pav.product.id " +
+    @Query("SELECT DISTINCT p FROM Product p " +
+            "LEFT JOIN CategoryProductList c ON p.id = c.product.id " +
+            "LEFT JOIN ProductAttributeValue pav ON p.id = pav.product.id " +
             "WHERE (:categoryId IS NULL OR c.category.id = :categoryId) " +
             "AND ((:search IS NULL OR :search = '') OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%'))) " +
             "AND (:attributeValue IS NULL OR pav.value IN :attributeValue)")

@@ -95,5 +95,36 @@
     "useExistingAddress": "Folosește adresa existentă",
     "enterNewAddress": "Introdu o adresă nouă",
     "confirmOrder": "Confirmă comanda"
+  },
+  "admin": {
+    "menu": {
+      "addProduct": "Adaugă produs",
+      "categories": "Categorii",
+      "orders": "Comenzi"
+    },
+    "category": {
+      "name": "Nume",
+      "description": "Descriere",
+      "addCategory": "Adaugă categorie",
+      "editCategory": "Editează categorie",
+      "actions": "Acțiuni",
+      "save": "Salvează"
+    }
+  },
+  "newsletter": {
+    "subscribe": "Abonează-te la newsletter",
+    "unsubscribe": "Dezabonează-te de la newsletter",
+    "yes": "Da",
+    "create": "Creează un newsletter",
+    "scheduleDate": "Data programării",
+    "repeat": "Repetă",
+    "repeatInterval": "Interval de repetare",
+    "interval": {
+      "daily": "Zilnic",
+      "weekly": "Săptămânal",
+      "monthly": "Lunar"
+    },
+    "preview": "Previzualizare newsletter",
+    "submit": "Trimite"
   }
 }

@@ -1,5 +1,6 @@
 package com.dialogdata.main.controller;
 
+import com.dialogdata.main.dto.CsvDto;
 import com.dialogdata.main.dto.ProductDto;
 import com.dialogdata.main.entity.Product;
 import com.dialogdata.main.mapper.ProductMapper;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -120,5 +122,22 @@ public class ProductController {
         }
 
         return ResponseEntity.ok(productMapper.toDto(updatedProduct));
+    }
+
+    @Operation(summary = "Add products via CSV file")
+    @ApiResponse(responseCode = "201", description = "Products added successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid CSV file format")
+    @PostMapping("/csv")
+    public ResponseEntity<CsvDto> addProductsFromCsv(
+            @Parameter(description = "CSV file containing product data", required = true)
+            @RequestParam("file") MultipartFile file) {
+
+        CsvDto csvDto = productService.addProductsFromCsv(file);
+
+        if (csvDto == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.status(201).body(csvDto);
     }
 }

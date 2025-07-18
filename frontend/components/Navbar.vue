@@ -111,6 +111,8 @@ const onLanguageChange = (event: any) => {
     </template>
 
     <template #end>
+<!--      TODO add if user is admin -->
+      <AdminMenu class="me-10" />
       <Dropdown
           v-model="locale"
           :options="languages"

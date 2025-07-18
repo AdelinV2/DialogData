@@ -1,6 +1,7 @@
 package com.dialogdata.main.dto;
 
 import com.dialogdata.main.entity.User;
+import com.dialogdata.main.util.Role;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -44,5 +45,11 @@ public class UserDto implements Serializable {
 
     @NotNull
     AddressDto billingAddress;
+
+    @NotNull
+    Boolean subscribed = false;
+
+    @NotNull
+    Role role = Role.USER;
 
 }

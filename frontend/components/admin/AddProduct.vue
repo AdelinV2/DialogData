@@ -1,11 +1,13 @@
 <script setup lang="ts">
 
-import type {Attribute} from "~/types/attribute";
 import type {Category} from "~/types/category";
 import type {Product} from "~/types/product";
 import type {Image} from "~/types/image";
 import type {AttributeValue} from "~/types/attributeValue";
 
+const { user } = useUserStorage();
+
+// TODO check if user is admin
 
 const product = ref<Product>({
   name: '',

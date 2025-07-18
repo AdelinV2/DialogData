@@ -24,21 +24,48 @@ const fetchOrders = () => {
     sort: 'orderDate,desc',
   }
 
-  $fetch(`${apiBaseUrl}/order/user/${user.value.id}`, {
-    method: 'GET',
-    params: params,
-    onResponse({response}) {
-      if (response.status === 200) {
-        orders.value = response._data.content as Order[];
-        console.log('Orders fetched successfully:', orders.value);
-      } else {
-        console.error('Failed to fetch orders');
+  // TODO if user is customer
+  if (false) {
+
+    $fetch(`${apiBaseUrl}/order/user/${user.value.id}`, {
+      method: 'GET',
+      params: params,
+      onResponse({response}) {
+        if (response.status === 200) {
+          orders.value = response._data.content as Order[];
+          pageInfo.value.totalElements = response._data.totalElements;
+          pageInfo.value.totalPages = response._data.totalPages;
+          console.log('Orders fetched successfully:', orders.value);
+        } else {
+          console.error('Failed to fetch orders');
+        }
+      },
+      onResponseError({response}) {
+        console.error('Error fetching orders:', response.status, response.statusText);
       }
-    },
-    onResponseError({response}) {
-      console.error('Error fetching orders:', response.status, response.statusText);
-    }
-  })
+    })
+  }
+  // TODO if user is admin
+  else if (true) {
+    $fetch(`${apiBaseUrl}/order`, {
+      method: 'GET',
+      params: params,
+      onResponse({response}) {
+        if (response.status === 200) {
+          orders.value = response._data.content as Order[];
+          pageInfo.value.totalElements = response._data.totalElements;
+          pageInfo.value.totalPages = response._data.totalPages;
+          console.log('Orders fetched successfully:', orders.value);
+        } else {
+          console.error('Failed to fetch orders');
+        }
+      },
+      onResponseError({response}) {
+        console.error('Error fetching orders:', response.status, response.statusText);
+      }
+    })
+  }
+
 }
 
 const onPageChange = (event: any) => {

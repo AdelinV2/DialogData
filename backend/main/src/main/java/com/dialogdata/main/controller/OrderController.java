@@ -38,6 +38,21 @@ public class OrderController {
         return ResponseEntity.ok(orders.map(orderMapper::toDto));
     }
 
+    @Operation(summary = "Get all orders ordered by date")
+    @ApiResponse(responseCode = "200", description = "Orders retrieved successfully")
+    @ApiResponse(responseCode = "204", description = "No orders found")
+    @GetMapping
+    public ResponseEntity<Page<OrderDto>> getAllOrdersByDate(Pageable pageable) {
+
+        Page<Order> orders = orderService.getAllOrdersOrderedByDate(pageable);
+
+        if (orders.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(orders.map(orderMapper::toDto));
+    }
+
     @Operation(summary = "Get order by ID")
     @ApiResponse(responseCode = "200", description = "Order found")
     @ApiResponse(responseCode = "404", description = "Order not found")

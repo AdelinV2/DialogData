@@ -14,7 +14,11 @@ import java.util.List;
 /**
  * DTO for {@link Product}
  */
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@Builder
 public class ProductDto implements Serializable {
 
     Integer id;

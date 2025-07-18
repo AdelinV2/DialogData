@@ -1,10 +1,7 @@
 package com.dialogdata.main.service;
 
 import com.dialogdata.main.client.ImageClient;
-import com.dialogdata.main.dto.CategoryDto;
-import com.dialogdata.main.dto.ImageDto;
-import com.dialogdata.main.dto.ProductAttributeValueDto;
-import com.dialogdata.main.dto.ProductDto;
+import com.dialogdata.main.dto.*;
 import com.dialogdata.main.entity.Product;
 import com.dialogdata.main.entity.ProductAttribute;
 import com.dialogdata.main.entity.ProductAttributeValue;
@@ -18,7 +15,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -35,6 +36,7 @@ public class ProductService {
     private final ProductAttributeMapper productAttributeMapper;
     private final ProductAttributeValueMapper productAttributeValueMapper;
     private final ImageClient imageClient;
+    private final CsvService csvService;
 
     public ProductDto findProductDtoById(Integer id) {
 
@@ -146,17 +148,42 @@ public class ProductService {
 
     public Page<Product> getProductsByCategoryIdAndSearchAndAttribute(Pageable pageable, Integer categoryId, String search, List<String> attributeValue) {
 
-//        if (categoryId != null && search != null && !search.isEmpty() && !attributeValue.isEmpty()) {
-//            return productRepository.findAllByCategoryIdAndNameContainingIgnoreCaseAndAttributeValue(categoryId, search, attributeValue, pageable);
-//        } else if (categoryId != null && search != null && !search.isEmpty()) {
-//            return productRepository.findAllByCategoryIdAndNameContainingIgnoreCase(categoryId, search, pageable);
-//        } else if (categoryId != null) {
-//            return productRepository.findAllByCategoryId(categoryId, pageable);
-//        } else if (search != null && !search.isEmpty()) {
-//            return productRepository.findAllByNameContainingIgnoreCase(search, pageable);
-//        } else {
-//            return productRepository.findAll(pageable);
-//        }
-        return productRepository.findAllByCategoryIdAndNameContainingIgnoreCaseAndAttributeValue(categoryId, search, attributeValue, pageable);
+        return productRepository
+                .findAllByCategoryIdAndNameContainingIgnoreCaseAndAttributeValue(categoryId, search, attributeValue, pageable);
     }
+
+    public CsvDto addProductsFromCsv(MultipartFile file) {
+
+        CsvDto csvDto = new CsvDto(0, new HashSet<>());
+        int index = 0;
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+
+            String line;
+
+            for (int i = 1; (line = br.readLine()) != null; i++) {
+                index = i;
+
+                try {
+                    ProductDto product = csvService.addProductFromCsv(line);
+                    if (this.createProduct(product) != null) {
+                        csvDto.setSuccessCount(csvDto.getSuccessCount() + 1);
+                    } else {
+                        csvDto.addFailedLine(index);
+                    }
+                    ;
+                } catch (Exception e) {
+                    csvDto.addFailedLine(index);
+                }
+
+            }
+
+        } catch (Exception e) {
+            csvDto.addFailedLine(index);
+        }
+
+        return csvDto;
+    }
+
+
 }

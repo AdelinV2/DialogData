@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -97,5 +99,10 @@ public class UserService {
 
     public User getUserByEmail(String userEmail) {
         return userRepository.findByEmail(userEmail);
+    }
+
+    public List<User> getAllUsersSubscribed() {
+
+        return userRepository.findAllBySubscribed(true);
     }
 }

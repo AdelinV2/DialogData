@@ -9,4 +9,5 @@ export interface User {
     password: string,
     deliveryAddress: Address,
     billingAddress: Address,
+    subscribed: boolean,
 }

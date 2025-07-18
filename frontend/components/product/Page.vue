@@ -72,6 +72,8 @@ const fetchProducts = () => {
     onResponse({response}) {
       if (response.status === 200) {
 
+        console.log('Fetching products with params:', params)
+
         products.value = response._data.content as Product[];
         pageInfo.value.totalElements = response._data.totalElements
         pageInfo.value.totalPages = response._data.totalPages
@@ -98,11 +100,6 @@ watch(
     {immediate: true}
 )
 
-// watch(
-//   () => attributeValue.value,
-//   fetchProducts,
-//   { immediate: true, deep: true }
-// );
 
 watch(
     attributeValue,

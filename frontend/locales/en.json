@@ -95,5 +95,36 @@
     "useExistingAddress": "Use existing address",
     "enterNewAddress": "Enter a new address",
     "confirmOrder": "Confirm Order"
+  },
+  "admin": {
+    "menu": {
+      "addProduct": "Add Product",
+      "categories": "Categories",
+      "orders": "Orders"
+    },
+    "category": {
+      "name": "Name",
+      "description": "Description",
+      "addCategory": "Add Category",
+      "editCategory": "Edit Category",
+      "actions": "Actions",
+      "save": "Save"
+    }
+  },
+  "newsletter": {
+    "subscribe": "Subscribe to our Newsletter",
+    "unsubscribe": "Unsubscribe from Newsletter",
+    "yes": "Yes",
+    "create": "Create a Newsletter",
+    "scheduleDate": "Schedule Date",
+    "repeat": "Repeat",
+    "repeatInterval": "Repeat Interval",
+    "interval": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly"
+    },
+    "preview": "Newsletter Preview",
+    "submit": "Submit"
   }
 }

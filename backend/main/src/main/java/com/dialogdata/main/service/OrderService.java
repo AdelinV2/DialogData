@@ -77,4 +77,8 @@ public class OrderService {
 
         return orderDto;
     }
+
+    public Page<Order> getAllOrdersOrderedByDate(Pageable pageable) {
+        return orderRepository.findAllOrderByOrderDate(pageable);
+    }
 }
