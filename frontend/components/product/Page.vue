@@ -3,6 +3,8 @@ import type {Product} from '~/types/product'
 import {ref} from "vue";
 
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl
+const route = useRoute()
+const router = useRouter()
 
 const {t} = useI18n()
 const {attributeValue} = useAttributeValue()
@@ -53,6 +55,28 @@ const headerImages = ref([
 const selectedCategory = ref<number | null>(null)
 const searchTerm = ref('')
 
+if (route.query.categoryId) {
+  selectedCategory.value = Number(route.query.categoryId)
+}
+if (route.query.search) {
+  searchTerm.value = String(route.query.search)
+}
+if (route.query.attributeValue) {
+  const attrValues = Array.isArray(route.query.attributeValue)
+      ? route.query.attributeValue
+      : [route.query.attributeValue];
+  attributeValue.value = attrValues.map(value => ({
+    value: String(value),
+    id: undefined,
+    attribute: {
+      id: undefined,
+      name: '',
+      type: ''
+    },
+    product: undefined
+  }));
+}
+
 const fetchProducts = () => {
   const params: Record<string, any> = {
     page: pageInfo.value.page,
@@ -95,6 +119,7 @@ watch(
       () => sort.value.order,
       selectedCategory,
       searchTerm,
+      attributeValue,
     ],
     fetchProducts,
     {immediate: true}
@@ -103,9 +128,15 @@ watch(
 
 watch(
     attributeValue,
-    fetchProducts,
-    { immediate: true, deep: true }
-)
+    (newVal, oldValue) => {
+      router.replace({
+        query: {
+          ...route.query,
+          attributeValue: newVal.map(av => av.value),
+        }
+      });
+
+    }, { deep: true})
 
 const onSortChange = (newSort: { by: string, order: string }) => {
   sort.value = newSort;
@@ -120,18 +151,35 @@ const onPageChange = (event: any) => {
 const onCategorySelected = (category: number | null) => {
   pageInfo.value.page = 0
   selectedCategory.value = category
+
+  router.replace({
+    query: {
+      ...route.query,
+      categoryId: category
+    }
+  })
 }
 
 const onSearch = (term: string) => {
   pageInfo.value.page = 0
   searchTerm.value = term
+
+  router.replace({
+    query: {
+      ...route.query,
+      search: term,
+    }
+  })
 }
 
 const isLoading = ref(true)
 
-onMounted(() => {
-  fetchProducts()
-})
+// onMounted(() => {
+//
+//
+//
+//   fetchProducts();
+// })
 
 </script>
 

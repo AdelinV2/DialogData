@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {ref} from 'vue'
+import {Role} from "~/types/role";
 
 const search = ref('')
 const emit = defineEmits<{ (e: 'search', term: string): void }>()
@@ -111,8 +112,7 @@ const onLanguageChange = (event: any) => {
     </template>
 
     <template #end>
-<!--      TODO add if user is admin -->
-      <AdminMenu class="me-10" />
+      <AdminMenu v-if="user && user.role === Role.ADMIN" class="me-10" />
       <Dropdown
           v-model="locale"
           :options="languages"

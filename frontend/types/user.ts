@@ -1,4 +1,5 @@
 import type {Address} from "~/types/address";
+import type {Role} from "~/types/role";
 
 export interface User {
     id?: number,
@@ -10,4 +11,5 @@ export interface User {
     deliveryAddress: Address,
     billingAddress: Address,
     subscribed: boolean,
+    role: Role
 }

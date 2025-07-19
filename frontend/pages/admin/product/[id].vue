@@ -1,20 +1,20 @@
 <script setup lang="ts">
 
-import {Role} from "~/types/role";
-
 const { user } = useUserStorage();
 
 onMounted(() => {
-  if (!user.value || user.value.role !== Role.ADMIN) {
+  if (!user.value || user.value.role !== 'ADMIN') {
     navigateTo('/');
   }
-})
+});
 
 </script>
 
 <template>
 
-  <AdminCategories />
+  <Navbar />
+  <AdminAddProduct />
+  <Footer />
 
 </template>
 

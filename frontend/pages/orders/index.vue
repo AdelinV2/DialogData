@@ -2,6 +2,7 @@
 
 import type {Order} from "~/types/order";
 import {navigateTo} from "#app";
+import {Role} from "~/types/role";
 
 const orders = ref([] as Order[])
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
@@ -24,8 +25,7 @@ const fetchOrders = () => {
     sort: 'orderDate,desc',
   }
 
-  // TODO if user is customer
-  if (false) {
+  if (user.value.role === Role.USER) {
 
     $fetch(`${apiBaseUrl}/order/user/${user.value.id}`, {
       method: 'GET',
@@ -45,8 +45,8 @@ const fetchOrders = () => {
       }
     })
   }
-  // TODO if user is admin
-  else if (true) {
+
+  else if (user.value.role === Role.ADMIN) {
     $fetch(`${apiBaseUrl}/order`, {
       method: 'GET',
       params: params,

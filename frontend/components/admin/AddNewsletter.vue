@@ -40,6 +40,8 @@ const submitNewsletter = () => {
     newsletter.value.repeatInterval = undefined;
   }
 
+  console.log(newsletter.value);
+
   $fetch(apiBaseUrl + '/newsletter', {
     method: 'POST',
     body: newsletter.value,
@@ -52,16 +54,17 @@ const submitNewsletter = () => {
           repeat: false,
           repeatInterval: undefined
         }
-        toast.add({severity: 'success', summary: t('newsletter.success')})
+        toast.add({severity: 'success', summary: t('newsletter.success'), life: 3000})
       } else {
-        toast.add({severity: 'error', summary: t('newsletter.error')})
+        toast.add({severity: 'error', summary: t('newsletter.error'), life: 3000})
       }
     },
     onResponseError({response}) {
-      toast.add({severity: 'error', summary: t('newsletter.error')})
+      toast.add({severity: 'error', summary: t('newsletter.error'), life: 3000})
     }
   })
 
+  loading.value = false;
 }
 
 </script>
@@ -90,6 +93,7 @@ const submitNewsletter = () => {
       <h2 class="text-xl font-semibold mb-2 self-center">{{ t('newsletter.repeat') }}</h2>
       <Checkbox v-model="newsletter.repeat" :label="t('newsletter.repeat')" class="self-center" binary/>
       <Dropdown v-model="intervalValue" :options="intervalOptions" optionLabel="label"
+                :option-value="option => option.value"
                 :placeholder="t('newsletter.repeatInterval')" class="w-full md:w-1/3 ms-14"
                 :disabled="!newsletter.repeat"/>
     </div>

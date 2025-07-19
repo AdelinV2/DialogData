@@ -1,7 +1,8 @@
 import type {AttributeValue} from "~/types/attributeValue";
 
-const attributeValue = ref<AttributeValue[]>([])
 
-export const useAttributeValue = () => {
+export const useAttributeValue = createSharedComposable(() => {
+    const attributeValue = ref<AttributeValue[]>([])
+
     return { attributeValue }
-}
+});

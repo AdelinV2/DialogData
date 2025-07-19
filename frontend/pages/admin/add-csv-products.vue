@@ -1,8 +1,14 @@
 <script setup lang="ts">
 
+import {Role} from "~/types/role";
+
 const { user } = useUserStorage();
 
-// TODO check if user is admin
+onMounted(() => {
+  if (!user.value || user.value.role !== Role.ADMIN) {
+    navigateTo('/');
+  }
+})
 
 </script>
 

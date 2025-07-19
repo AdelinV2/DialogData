@@ -1,7 +1,7 @@
 package com.dialogdata.main.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -9,7 +9,10 @@ import java.time.Instant;
 /**
  * DTO for {@link com.dialogdata.main.entity.Newsletter}
  */
-@Value
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class NewsletterDto implements Serializable {
 
     Integer id;
@@ -26,5 +29,5 @@ public class NewsletterDto implements Serializable {
     @NotNull
     Boolean repeat;
 
-    Integer repeatInterval;
+    Long repeatInterval;
 }

@@ -17,13 +17,13 @@ const onSubscribeSubmit = () => {
       if (response.status === 200) {
         saveUser(user.value);
         if (user.value.subscribed) {
-          toast.add({severity: 'success', summary: t('footer.subscribeSuccess')});
+          toast.add({severity: 'success', summary: t('newsletter.subscribeSuccess')});
         } else {
-          toast.add({severity: 'info', summary: t('footer.unsubscribeSuccess')});
+          toast.add({severity: 'info', summary: t('newsletter.unsubscribeSuccess')});
         }
       } else {
           user.value.subscribed = !user.value.subscribed;
-        toast.add({severity: 'error', summary: t('footer.error')});
+        toast.add({severity: 'error', summary: "Error"});
       }
     }
   })
@@ -56,8 +56,8 @@ const onSubscribeSubmit = () => {
   </footer>
 
   <Dialog v-model:visible="showSubscribeDialog" :style="{ width: '450px' }"
-          :header="user?.subscribed ? t('footer.unsubscribe') + '?' : t('footer.subscribe') + '?'">
-    <Button :label="t('newslatter.yes')"
+          :header="user?.subscribed ? t('newsletter.unsubscribe') : t('newsletter.subscribe')">
+    <Button :label="t('newsletter.yes')"
             class="w-full mt-5"
             @click="onSubscribeSubmit"/>
   </Dialog>

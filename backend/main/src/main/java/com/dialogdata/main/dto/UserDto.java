@@ -46,10 +46,8 @@ public class UserDto implements Serializable {
     @NotNull
     AddressDto billingAddress;
 
-    @NotNull
-    Boolean subscribed = false;
+    Boolean subscribed;
 
-    @NotNull
-    Role role = Role.USER;
+    Role role;
 
 }

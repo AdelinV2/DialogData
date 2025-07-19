@@ -57,7 +57,7 @@ public class NewsletterController {
     @ApiResponse(responseCode = "404", description = "Newsletter not found")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNewsletter(@Parameter(description = "Newsletter ID", required = true)
-                                                 @PathVariable Integer id) {
+                                                 @PathVariable("id") Integer id) {
 
         if (newsletterService.delete(id)) {
             return ResponseEntity.ok().build();

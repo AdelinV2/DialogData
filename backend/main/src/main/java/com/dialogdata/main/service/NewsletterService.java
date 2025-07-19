@@ -2,6 +2,7 @@ package com.dialogdata.main.service;
 
 import com.dialogdata.main.entity.Newsletter;
 import com.dialogdata.main.repository.NewsletterRepository;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -65,8 +66,14 @@ public class NewsletterService {
                 }
 
                 userService.getAllUsersSubscribed().forEach(user -> {
-                    emailService.sendEmail(user.getEmail(), "Newsletter", newsletter.getContent());
+                    try {
+                        emailService.sendHtmlEmail(user.getEmail(), "Newsletter", newsletter.getContent());
+                    } catch (MessagingException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
+
+                System.out.println("Newsletter " + newsletter + "sent");
             }
         });
     }

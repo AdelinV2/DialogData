@@ -100,7 +100,9 @@
     "menu": {
       "addProduct": "Adaugă produs",
       "categories": "Categorii",
-      "orders": "Comenzi"
+      "orders": "Comenzi",
+      "addCSVProducts": "Adaugă produse din CSV",
+      "newsletters": "Newsletters"
     },
     "category": {
       "name": "Nume",
@@ -125,6 +127,9 @@
       "monthly": "Lunar"
     },
     "preview": "Previzualizare newsletter",
-    "submit": "Trimite"
+    "submit": "Trimite",
+    "addNewsletter": "Adaugă newsletter",
+    "content": "Conținut",
+    "actions": "Acțiuni",
   }
 }

@@ -100,7 +100,9 @@
     "menu": {
       "addProduct": "Add Product",
       "categories": "Categories",
-      "orders": "Orders"
+      "orders": "Orders",
+      "addCSVProducts": "Add Products via CSV",
+      "newsletters": "Newsletters"
     },
     "category": {
       "name": "Name",
@@ -120,11 +122,14 @@
     "repeat": "Repeat",
     "repeatInterval": "Repeat Interval",
     "interval": {
-        "daily": "Daily",
-        "weekly": "Weekly",
-        "monthly": "Monthly"
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly"
     },
     "preview": "Newsletter Preview",
-    "submit": "Submit"
+    "submit": "Submit",
+    "addNewsletter": "Add Newsletter",
+    "content": "Content",
+    "actions": "Actions",
   }
 }

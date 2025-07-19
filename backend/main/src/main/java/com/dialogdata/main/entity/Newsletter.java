@@ -2,8 +2,7 @@ package com.dialogdata.main.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
@@ -11,6 +10,9 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 @Table(name = "newsletter")
 public class Newsletter {
 
@@ -37,8 +39,7 @@ public class Newsletter {
     @Column(name = "repeat", nullable = false)
     private Boolean repeat = false;
 
-    @NotNull
     @Column(name = "repeat_interval")
-    private Integer repeatInterval;
+    private Long repeatInterval;
 
 }

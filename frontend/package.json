@@ -17,6 +17,7 @@
     "@primevue/themes": "^4.3.6",
     "@vueuse/core": "^13.5.0",
     "@vueuse/nuxt": "^13.5.0",
+    "dayjs": "^1.11.13",
     "nuxt": "^3.17.6",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.6",

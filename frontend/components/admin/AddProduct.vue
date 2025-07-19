@@ -6,8 +6,8 @@ import type {Image} from "~/types/image";
 import type {AttributeValue} from "~/types/attributeValue";
 
 const { user } = useUserStorage();
-
-// TODO check if user is admin
+const route = useRoute();
+const productId = route.params.id;
 
 const product = ref<Product>({
   name: '',
@@ -23,6 +23,34 @@ const product = ref<Product>({
 const toast = useToast();
 const categories = ref<Category[]>([])
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
+
+if (productId) {
+  $fetch(`${apiBaseUrl}/products/${productId}`, {
+    method: 'GET',
+    onResponse({response}) {
+      if (response.status === 200) {
+        product.value = response._data as Product;
+        console.log('Product fetched successfully:', product.value);
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to fetch product',
+          life: 3000,
+        });
+        console.error('Failed to fetch product');
+      }
+    },
+  }).catch((error) => {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Error fetching product',
+      life: 3000,
+    });
+    console.error('Error fetching product:', error);
+  });
+}
 
 function handleImageChange(event: Event) {
   const target = event.target as HTMLInputElement | null;
@@ -164,6 +192,43 @@ function onSubmit() {
     },
   }).catch((error) => {
     console.error('Error adding product:', error);
+  });
+}
+
+const onDelete = () => {
+  $fetch(`${apiBaseUrl}/products/${productId}`, {
+    method: 'DELETE',
+    onResponse({response}) {
+      if (response.status === 200) {
+        console.log('Product deleted successfully');
+        toast.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Product deleted successfully',
+          life: 3000,
+        });
+        product.value = {
+          name: '',
+          description: '',
+          price: 0,
+          availableQuantity: 0,
+          addedDate: new Date(),
+          attributes: [] as AttributeValue[],
+          category: {} as Category,
+          images: [] as Image[],
+        };
+      } else {
+        console.error('Failed to delete product');
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to delete product',
+          life: 3000,
+        });
+      }
+    },
+  }).catch((error) => {
+    console.error('Error deleting product:', error);
   });
 }
 
@@ -377,6 +442,8 @@ function addAttribute() {
       </div>
       <Button label="Submit" class="w-full mt-5" @click="onSubmit"
               :disabled="!product.name || !product.description || product.price <= 0 || !product.addedDate || !product.category || product.attributes.length === 0 || product.images?.length === 0"/>
+      <Button v-if="productId" label="Delete Product" class="w-full mt-2" severity="danger"
+              @click="onDelete" :disabled="!productId"/>
     </template>
   </Card>
 

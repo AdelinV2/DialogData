@@ -29,6 +29,11 @@ const menuItems = [
         label: t('admin.menu.orders'),
         icon: 'pi pi-shopping-cart',
         command: () => navigateTo('/orders')
+      },
+      {
+        label: t('admin.menu.newsletters'),
+        icon: 'pi pi-envelope',
+        command: () => navigateTo('/admin/newsletters')
       }
     ]
   }
