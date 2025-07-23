@@ -28,6 +28,7 @@ public class ImageKitService {
     }
 
     public List<String> getProductImages(Integer productId) throws Exception {
+
         String prefix = productId + "_";
         GetFileListRequest request = new GetFileListRequest();
         request.setPath("/products/");
@@ -37,5 +38,18 @@ public class ImageKitService {
         return resultList.getResults().stream()
                 .map(BaseFile::getUrl)
                 .toList();
+    }
+
+    public void deleteProductImages(Integer productId) throws Exception {
+
+        String prefix = productId + "_";
+        GetFileListRequest request = new GetFileListRequest();
+        request.setPath("/products/");
+        request.setSearchQuery("name : \"" + prefix + "\"");
+        ResultList resultList = imageKit.getFileList(request);
+
+      for (BaseFile file : resultList.getResults()) {
+          imageKit.deleteFile(file.getFileId());
+      }
     }
 }

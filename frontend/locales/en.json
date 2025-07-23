@@ -62,7 +62,8 @@
     "name": "Name",
     "value": "Value",
     "shoppingCart": "Shopping Cart",
-    "checkout": "Checkout"
+    "checkout": "Checkout",
+    "sale": "Sale"
   },
   "resetPassword": {
     "resetPassword": "Reset Password",
@@ -130,6 +131,14 @@
     "submit": "Submit",
     "addNewsletter": "Add Newsletter",
     "content": "Content",
-    "actions": "Actions",
+    "actions": "Actions"
+  },
+  "review": {
+    "reviews": "Reviews",
+    "writeReview": "Write a Review",
+    "stars": "Stars",
+    "rating": "Rating",
+    "comment": "Comment",
+    "submitReview": "Submit Review"
   }
 }

@@ -12,6 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -48,4 +49,16 @@ public class Product {
     @ColumnDefault("CURRENT_DATE")
     @Column(name = "added_date", nullable = false)
     private LocalDate addedDate;
+
+    @NotNull
+    @ColumnDefault("false")
+    @Column(name = "promoted", nullable = false)
+    private Boolean promoted = false;
+
+    @ColumnDefault("NULL")
+    @Column(name = "promotion_price", precision = 7, scale = 2)
+    private BigDecimal promotionPrice;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews;
 }

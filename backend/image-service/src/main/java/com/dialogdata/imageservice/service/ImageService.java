@@ -20,4 +20,8 @@ public class ImageService {
 
         return imageKitService.getProductImages(productId);
     }
+
+    public void deleteProductImages(Integer productId) throws Exception {
+        imageKitService.deleteProductImages(productId);
+    }
 }

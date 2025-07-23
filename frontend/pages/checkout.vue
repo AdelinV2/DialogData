@@ -8,6 +8,7 @@ import {navigateTo} from "#app";
 const {user} = useUserStorage();
 const {t} = useI18n();
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
+const loading = ref(false);
 
 onMounted(() => {
   if (!user.value) {
@@ -67,6 +68,8 @@ const billingAddress = computed(() => {
 });
 
 const confirmOrder = () => {
+
+  loading.value = true;
 
   const orderDetails = {
     userId: user.value.id,
@@ -201,7 +204,10 @@ const confirmOrder = () => {
             <Dropdown v-model="selectedPayment" :options="paymentMethods" optionLabel="label" optionValue="value"
                       class="w-full"/>
           </div>
-          <Button :label="t('order.confirmOrder')" class="w-full" severity="primary" @click="confirmOrder" :disabled="cart?.cartEntries.length === 0"/>
+          <Button :label="t('order.confirmOrder')" class="w-full" severity="primary" @click="confirmOrder" :disabled="cart?.cartEntries.length === 0 || loading"/>
+          <div class="card mt-6">
+            <ProgressBar v-if="loading" mode="indeterminate" style="height: 6px"></ProgressBar>
+          </div>
         </template>
       </Card>
     </div>

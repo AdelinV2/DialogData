@@ -2,6 +2,7 @@ package com.dialogdata.main.client;
 
 import com.dialogdata.main.dto.ImageDto;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,9 @@ public interface ImageClient {
     @PostMapping
     void uploadImage(ImageDto imageDto);
 
-    @GetMapping("/get/{productId}")
+    @GetMapping("/{productId}")
     List<String> getProductImagesUrl(@PathVariable("productId") Integer productId);
+
+    @DeleteMapping("/{productId}")
+    void deleteProductImages(@PathVariable("productId") Integer productId);
 }

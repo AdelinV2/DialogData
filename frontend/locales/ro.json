@@ -62,7 +62,8 @@
     "name": "Nume",
     "value": "Valoare",
     "shoppingCart": "Coș de cumpărături",
-    "checkout": "Finalizare comandă"
+    "checkout": "Finalizare comandă",
+    "sale": "Reducere"
   },
   "resetPassword": {
     "resetPassword": "Resetează parola",
@@ -130,6 +131,14 @@
     "submit": "Trimite",
     "addNewsletter": "Adaugă newsletter",
     "content": "Conținut",
-    "actions": "Acțiuni",
+    "actions": "Acțiuni"
+  },
+  "review": {
+    "reviews": "Recenzii",
+    "writeReview": "Scrie o recenzie",
+    "rating": "Evaluare",
+    "stars": "Stele",
+    "comment": "Comentariu",
+    "submitReview": "Trimite recenzia"
   }
 }

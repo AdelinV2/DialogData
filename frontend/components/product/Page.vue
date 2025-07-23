@@ -9,6 +9,7 @@ const router = useRouter()
 const {t} = useI18n()
 const {attributeValue} = useAttributeValue()
 const products = ref<Product[]>([])
+const promotedProducts = ref<Product[]>([])
 const pageInfo = ref({page: 0, size: 12, totalElements: 0, totalPages: 0})
 const sort = ref({by: 'addedDate', order: 'desc'})
 
@@ -75,6 +76,21 @@ if (route.query.attributeValue) {
     },
     product: undefined
   }));
+}
+
+const fetchPromotedProducts = () => {
+  $fetch(`${apiBaseUrl}/products/promoted`, {
+    method: 'GET',
+    onResponse({response}) {
+      if (response.status === 200) {
+        console.log('Fetching promoted products')
+        promotedProducts.value = response._data as Product[];
+        console.log('Promoted products fetched successfully:', promotedProducts.value)
+      } else {
+        console.error('Failed to fetch promoted products')
+      }
+    },
+  })
 }
 
 const fetchProducts = () => {
@@ -174,12 +190,7 @@ const onSearch = (term: string) => {
 
 const isLoading = ref(true)
 
-// onMounted(() => {
-//
-//
-//
-//   fetchProducts();
-// })
+fetchPromotedProducts();
 
 </script>
 
@@ -209,6 +220,7 @@ const isLoading = ref(true)
       </div>
     </div>
 
+    <ProductPromoted :products="promotedProducts" class="my-10"/>
 
     <div class="flex-auto me-5">
       <ProductList :rows="pageInfo.size" :loading="isLoading" :products="products" :sort="sort"

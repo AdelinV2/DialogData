@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/products")
@@ -115,7 +117,7 @@ public class ProductController {
             @Parameter(description = "Updated product data", required = true)
             @RequestBody @Valid ProductDto productDto) {
 
-        Product updatedProduct = productService.updateProduct(id, productMapper.toEntity(productDto));
+        Product updatedProduct = productService.updateProduct(id, productDto);
 
         if (updatedProduct == null) {
             return ResponseEntity.notFound().build();
@@ -124,20 +126,55 @@ public class ProductController {
         return ResponseEntity.ok(productMapper.toDto(updatedProduct));
     }
 
+    @Operation(summary = "Delete a product by ID")
+    @ApiResponse(responseCode = "204", description = "Product deleted successfully")
+    @ApiResponse(responseCode = "404", description = "Product not found")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProductById(
+            @Parameter(description = "ID of the product to delete", required = true)
+            @PathVariable("id") Integer id) {
+
+        boolean deleted = productService.deleteProductById(id);
+
+        if (!deleted) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
     @Operation(summary = "Add products via CSV file")
     @ApiResponse(responseCode = "201", description = "Products added successfully")
     @ApiResponse(responseCode = "400", description = "Invalid CSV file format")
     @PostMapping("/csv")
     public ResponseEntity<CsvDto> addProductsFromCsv(
             @Parameter(description = "CSV file containing product data", required = true)
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("file") MultipartFile file) throws ExecutionException, InterruptedException {
 
-        CsvDto csvDto = productService.addProductsFromCsv(file);
+        CompletableFuture<CsvDto> csvDto = productService.addProductsFromCsv(file);
 
-        if (csvDto == null) {
-            return ResponseEntity.badRequest().build();
+        while (!csvDto.isDone()) {
+            if (csvDto.isCompletedExceptionally()) {
+                return ResponseEntity.badRequest().build();
+            }
+            Thread.sleep(500);
         }
 
-        return ResponseEntity.status(201).body(csvDto);
+        return ResponseEntity.status(201).body(csvDto.get());
+    }
+
+    @Operation(summary = "Get promoted products")
+    @ApiResponse(responseCode = "200", description = "List of promoted products retrieved")
+    @ApiResponse(responseCode = "404", description = "No promoted products found")
+    @GetMapping("/promoted")
+    public ResponseEntity<List<ProductDto>> getPromotedProducts() {
+
+        List<ProductDto> promotedProducts = productService.getPromotedProducts();
+
+        if (promotedProducts.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(promotedProducts);
     }
 }

@@ -108,10 +108,33 @@ const getStockLabel = () => {
           <h2 class="text-2xl font-semibold">{{ product.name }}</h2>
         </template>
         <template #subtitle>
-          <p class="text-2xl font-semibold">${{ product.price }}</p>
+          <div v-if="product.promotionPrice" class="flex flex-row mb-2">
+            <div class="flex flex-col">
+              <span class="text-gray-400 line-through text-xl">${{ product.price.toFixed(2) }}</span>
+              <span class="text-red-600 font-bold text-3xl">${{ product.promotionPrice.toFixed(2) }}</span>
+            </div>
+            <span class="text-white font-semibold text-xl ml-auto">
+                {{ ((product.price - product.promotionPrice) / product.price * 100).toFixed(0) }}% {{
+                t('product.sale')
+              }}
+              </span>
+          </div>
+          <div v-else class="mb-2">
+            <span class="text-gray-300 text-3xl">${{ product.price.toFixed(2) }}</span>
+          </div>
         </template>
         <template #content>
-          <Tag :value="getStockLabel()" :severity="getSeverity()"></Tag>
+          <div class="flex justify-between">
+            <Tag :value="getStockLabel()" :severity="getSeverity()"></Tag>
+            <div class="bg-surface-100 p-1 bg-white" style="border-radius: 30px">
+              <div class="bg-surface-0 flex items-center gap-2 justify-center py-1 px-2"
+                   style="border-radius: 30px; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px 0px rgba(0, 0, 0, 0.06)">
+                <span class="text-surface-900 font-medium text-sm text-gray-900">
+                  {{ product.averageRating ? product.averageRating.toFixed(2) : 0 }}</span>
+                <i class="pi pi-star-fill text-yellow-500"></i>
+              </div>
+            </div>
+          </div>
           <div class="my-5 flex items-center">
             <Button
                 icon="pi pi-minus"
@@ -176,6 +199,8 @@ const getStockLabel = () => {
         </AccordionPanel>
       </Accordion>
     </div>
+
+    <ProductReview :product="props.product" class="mt-10"/>
 
   </div>
 

@@ -7,7 +7,7 @@ import type {TreeNode} from "primevue/treenode";
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 
 const attributes = ref<Attribute[]>([]);
-const selectedKeys = ref<Record<string, boolean>>({});
+const selectedKeys = ref<Record<number, boolean>>({});
 const selectedAttributeValues = ref<AttributeValue[]>([] as AttributeValue[]);
 const attrValuesMap = ref<Record<number, AttributeValue[]>>({});
 const {attributeValue} = useAttributeValue();
@@ -35,6 +35,13 @@ const fetchAttributeValues = (attributeId: number) => {
     onResponse({response}) {
       if (response.status === 200) {
         attrValuesMap.value[attributeId] = response._data as AttributeValue[];
+
+        attrValuesMap.value[attributeId].forEach((av: AttributeValue) => {
+          if (attributeValue.value.map(v => v.value).includes(av.value)) {
+            selectedKeys.value[av.id as number] = true;
+          }
+        });
+
         console.log(`Attribute values for ${attributeId} fetched successfully:`, attrValuesMap.value[attributeId]);
       } else {
         console.error(`Failed to fetch attribute values for ${attributeId}`);
@@ -46,25 +53,25 @@ const fetchAttributeValues = (attributeId: number) => {
 fetchAttributes();
 
 const treeNodes = computed<TreeNode[]>(() =>
-  attributes.value.map(attr => {
-    const children = attrValuesMap.value[attr.id ?? 0];
-    return {
-      key: String(attr.id ?? ''),
-      label: attr.name,
-      data: attr,
-      selectable: false,
-      leaf: false,
-      children: children
-        ? children.map((val: AttributeValue) => ({
-            key: String(val.id ?? ''),
-            label: val.value,
-            data: val,
-            leaf: true,
-            selectable: true
-          }))
-        : undefined
-    } as TreeNode;
-  })
+    attributes.value.map(attr => {
+      const children = attrValuesMap.value[attr.id ?? 0];
+      return {
+        key: String(attr.id ?? ''),
+        label: attr.name,
+        data: attr,
+        selectable: false,
+        leaf: false,
+        children: children
+            ? children.map((val: AttributeValue) => ({
+              key: String(val.id ?? ''),
+              label: val.value,
+              data: val,
+              leaf: true,
+              selectable: true
+            }))
+            : undefined
+      } as TreeNode;
+    })
 );
 
 const onNodeExpand = (node: any) => {

@@ -44,4 +44,10 @@ public class ProductDto implements Serializable {
     CategoryDto category;
 
     List<ImageDto> images;
+
+    Boolean promoted;
+
+    BigDecimal promotionPrice;
+
+    BigDecimal averageRating;
 }

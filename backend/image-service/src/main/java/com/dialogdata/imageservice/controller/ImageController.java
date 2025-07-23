@@ -23,11 +23,19 @@ public class ImageController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/get/{productId}")
+    @GetMapping("/{productId}")
     public ResponseEntity<List<String>> getProductImages(@PathVariable("productId") Integer productId) throws Exception {
 
         List<String> images = imageService.getProductImages(productId);
 
         return ResponseEntity.ok(images);
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> deleteProductImages(@PathVariable("productId") Integer productId) throws Exception {
+
+        imageService.deleteProductImages(productId);
+
+        return ResponseEntity.ok().build();
     }
 }

@@ -4,6 +4,8 @@ import com.dialogdata.main.entity.Newsletter;
 import com.dialogdata.main.repository.NewsletterRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@EnableAsync
 public class NewsletterService {
 
     private final UserService userService;
@@ -54,6 +57,7 @@ public class NewsletterService {
     }
 
     @Scheduled(fixedRate = 60000)
+    @Async
     public void sendScheduledNewsletters() {
 
         newsletterRepository.findAll().forEach(newsletter -> {

@@ -12,4 +12,7 @@ export interface Product {
     attributes: AttributeValue[],
     category: Category,
     images: Image[],
+    promoted: boolean,
+    promotionPrice?: number,
+    averageRating?: number,
 }

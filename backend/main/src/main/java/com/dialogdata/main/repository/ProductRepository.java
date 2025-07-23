@@ -32,4 +32,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
                                                                                   @Param("search") String search,
                                                                                   @Param("attributeValue") List<String> attributeValue,
                                                                                   Pageable pageable);
+
+    List<Product> findAllByPromoted(boolean promoted);
 }

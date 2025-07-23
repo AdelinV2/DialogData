@@ -5,9 +5,10 @@ import type {Product} from "~/types/product";
 import type {Image} from "~/types/image";
 import type {AttributeValue} from "~/types/attributeValue";
 
-const { user } = useUserStorage();
+const {user} = useUserStorage();
 const route = useRoute();
 const productId = route.params.id;
+const loading = ref(false);
 
 const product = ref<Product>({
   name: '',
@@ -18,11 +19,46 @@ const product = ref<Product>({
   attributes: [] as AttributeValue[],
   category: {} as Category,
   images: [] as Image[],
+  promoted: false,
+  promotionPrice: undefined,
 })
 
 const toast = useToast();
 const categories = ref<Category[]>([])
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
+
+async function urlToBase64(url: string): Promise<string> {
+
+  const response = await fetch(url);
+  const blob = await response.blob();
+
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function processProductImages() {
+  if (!product.value?.images) return;
+
+  for (let idx = 0; idx < product.value.images.length; idx++) {
+    const img = product.value.images[idx];
+    const base64 = await urlToBase64(img.imageUrl);
+    img.base64 = base64;
+    img.fileName = idx.toString();
+    const arr = base64.split(',');
+    const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) u8arr[n] = bstr.charCodeAt(n);
+    const file = new File([u8arr], `${idx}.png`, { type: mime });
+    (file as any).objectURL = base64;
+    uploadedFiles.value[idx] = file;
+  }
+}
 
 if (productId) {
   $fetch(`${apiBaseUrl}/products/${productId}`, {
@@ -30,6 +66,9 @@ if (productId) {
     onResponse({response}) {
       if (response.status === 200) {
         product.value = response._data as Product;
+
+        processProductImages();
+
         console.log('Product fetched successfully:', product.value);
       } else {
         toast.add({
@@ -157,7 +196,43 @@ $fetch(`${apiBaseUrl}/category`, {
   console.error('Error fetching categories:', error);
 });
 
+function onUpdate() {
+
+  loading.value = true;
+
+  $fetch(`${apiBaseUrl}/products/${productId}`, {
+    method: 'PUT',
+    body: product.value,
+    onResponse({response}) {
+      if (response.status === 200) {
+        console.log('Product updated successfully:', response._data);
+        toast.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Product updated successfully',
+          life: 3000,
+        });
+      } else {
+        console.error('Failed to update product');
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to update product',
+          life: 3000,
+        });
+      }
+    },
+  }).catch((error) => {
+    console.error('Error updating product:', error);
+  }).finally(() => {
+    loading.value = false;
+  });
+}
+
 function onSubmit() {
+
+  loading.value = true;
+
   $fetch(`${apiBaseUrl}/products`, {
     method: 'POST',
     body: product.value,
@@ -179,6 +254,8 @@ function onSubmit() {
           attributes: [] as AttributeValue[],
           category: {} as Category,
           images: [] as Image[],
+          promoted: false,
+          promotionPrice: undefined,
         };
       } else {
         console.error('Failed to add product');
@@ -216,6 +293,8 @@ const onDelete = () => {
           attributes: [] as AttributeValue[],
           category: {} as Category,
           images: [] as Image[],
+          promoted: false,
+          promotionPrice: undefined,
         };
       } else {
         console.error('Failed to delete product');
@@ -294,6 +373,17 @@ function addAttribute() {
 
         <InputGroup>
           <InputGroupAddon>
+            <i class="pi pi-dollar"></i>
+          </InputGroupAddon>
+          <FloatLabel variant="on">
+            <InputNumber id="promotionPrice" type="number" :max="product.price" :max-fraction-digits="2"
+                         v-model="product.promotionPrice"/>
+            <label for="promotionPrice">Promotion Price (optional)</label>
+          </FloatLabel>
+        </InputGroup>
+
+        <InputGroup>
+          <InputGroupAddon>
             <i class="pi pi-box"></i>
           </InputGroupAddon>
           <FloatLabel variant="on">
@@ -348,6 +438,11 @@ function addAttribute() {
           </FloatLabel>
         </InputGroup>
 
+        <div class="flex items-center gap-2 mb-4">
+          <i class="mx-2 pi pi-star text-yellow-500"></i>
+          <label for="promoted">Promoted</label>
+          <ToggleSwitch v-model="product.promoted"/>
+        </div>
         <InputGroup>
           <div class="card w-full">
             <Toast/>
@@ -440,10 +535,18 @@ function addAttribute() {
           </div>
         </InputGroup>
       </div>
-      <Button label="Submit" class="w-full mt-5" @click="onSubmit"
-              :disabled="!product.name || !product.description || product.price <= 0 || !product.addedDate || !product.category || product.attributes.length === 0 || product.images?.length === 0"/>
-      <Button v-if="productId" label="Delete Product" class="w-full mt-2" severity="danger"
-              @click="onDelete" :disabled="!productId"/>
+      <Button v-if="productId === null" label="Submit" class="w-full mt-5" @click="onSubmit"
+              :disabled="!product.name || !product.description || product.price <= 0 || !product.addedDate || !product.category || product.attributes.length === 0 || product.images?.length === 0 || loading"/>
+      <div v-else class="mt-5">
+        <Button label="Update Product" class="w-full mt-2" severity="contrast"
+                @click="onUpdate"
+                :disabled="!product.name || !product.description || product.price <= 0 || !product.addedDate || !product.category || product.attributes.length === 0 || product.images?.length === 0 || loading"/>
+        <Button v-if="productId" label="Delete Product" class="w-full mt-4" severity="danger"
+                @click="onDelete" :disabled="!productId"/>
+      </div>
+      <div class="card my-6">
+        <ProgressBar v-if="loading" mode="indeterminate" style="height: 6px"></ProgressBar>
+      </div>
     </template>
   </Card>
 

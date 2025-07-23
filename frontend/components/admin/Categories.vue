@@ -15,8 +15,6 @@ const newCategory = ref<Category>({
   description: ''
 })
 
-// TODO check if user is admin
-
 const fetchCategories = () => {
   $fetch(`${apiBaseUrl}/category`, {
     method: 'GET',
@@ -99,6 +97,7 @@ onMounted(() => {
   <div class="container mx-auto px-12 my-12">
     <Button label="Add category" icon="pi pi-plus" @click="addDialogVisibile = true" class="mb-4"/>
     <DataTable :value="categories" dataKey="id" striped-rows responsiveLayout="scroll">
+      <Column field="id" header="ID" class="w-1/6"/>
       <Column field="name" :header="t('admin.category.name')"/>
       <Column field="description" :header="t('admin.category.description')"/>
       <Column :header="t('admin.category.actions')" class=" flex gap-5 !text-center">

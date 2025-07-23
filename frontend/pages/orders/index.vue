@@ -86,7 +86,7 @@ const onPageChange = (event: any) => {
       <Column field="id" :header="t('order.orderNumber')" />
       <Column field="orderDate" :header="t('order.orderDate')">
         <template #body="{ data }">
-          {{ new Date(data.orderDate).toLocaleString() }}
+          {{ new Date(data.orderDate).toLocaleDateString('en-GB') }}
         </template>
       </Column>
       <Column field="totalPrice" :header="t('order.totalPrice')">

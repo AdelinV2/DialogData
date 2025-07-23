@@ -14,6 +14,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,9 +24,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 @Service
 @RequiredArgsConstructor
+@EnableAsync
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -37,6 +43,7 @@ public class ProductService {
     private final ProductAttributeValueMapper productAttributeValueMapper;
     private final ImageClient imageClient;
     private final CsvService csvService;
+    private final ReviewService reviewService;
 
     public ProductDto findProductDtoById(Integer id) {
 
@@ -52,6 +59,7 @@ public class ProductService {
         ProductDto productDto = productMapper.toDto(product);
         productDto.setAttributes(productAttributeValueMapper.toDtoList(attributes));
         productDto.setCategory(category);
+        productDto.setAverageRating(reviewService.getAverageRatingByProductId(id));
 
         return productDto;
     }
@@ -99,6 +107,8 @@ public class ProductService {
 
         productRepository.delete(product);
 
+        imageClient.deleteProductImages(id);
+
         return true;
     }
 
@@ -107,7 +117,7 @@ public class ProductService {
     }
 
     @Transactional
-    public Product updateProduct(Integer id, Product entity) {
+    public Product updateProduct(Integer id, ProductDto product) {
 
         Product existingProduct = productRepository.findById(id).orElse(null);
 
@@ -115,9 +125,17 @@ public class ProductService {
             return null;
         }
 
-        entity.setId(id);
+        product.setId(id);
+        imageClient.deleteProductImages(id);
 
-        return productRepository.save(entity);
+        Product savedProduct = productRepository.save(productMapper.toEntity(product));
+
+        for (ImageDto image : product.getImages()) {
+            image.setFileName(savedProduct.getId() + "_" + image.getFileName());
+            imageClient.uploadImage(image);
+        }
+
+        return savedProduct;
     }
 
     public List<ImageDto> getProductImagesByProductId(Integer productId) {
@@ -152,7 +170,8 @@ public class ProductService {
                 .findAllByCategoryIdAndNameContainingIgnoreCaseAndAttributeValue(categoryId, search, attributeValue, pageable);
     }
 
-    public CsvDto addProductsFromCsv(MultipartFile file) {
+    @Async
+    public CompletableFuture<CsvDto> addProductsFromCsv(MultipartFile file) {
 
         CsvDto csvDto = new CsvDto(0, new HashSet<>());
         int index = 0;
@@ -182,8 +201,19 @@ public class ProductService {
             csvDto.addFailedLine(index);
         }
 
-        return csvDto;
+        return CompletableFuture.completedFuture(csvDto);
     }
 
 
+    public List<ProductDto> getPromotedProducts() {
+
+        List<ProductDto> promotedProducts = productMapper.toDtoList(productRepository.findAllByPromoted(true));
+
+        for (ProductDto product : promotedProducts) {
+            product.setImages(getProductImagesByProductId(product.getId()));
+            product.setAverageRating(reviewService.getAverageRatingByProductId(product.getId()));
+        }
+
+        return promotedProducts;
+    }
 }
