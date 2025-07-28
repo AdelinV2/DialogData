@@ -1,4 +1,4 @@
-package com.dialogdata.main.util;
+package com.dialogdata.main.enums;
 
 public enum Role {
     USER("USER"),

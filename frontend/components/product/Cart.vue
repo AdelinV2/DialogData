@@ -169,15 +169,27 @@ const getStockName = (product: Product) => {
                     </div>
                   </div>
                   <div class="flex flex-col md:items-end gap-8">
-                    <span class="text-2xl font-bold">
-                      <span v-if="entry.product && entry.product.id && products[entry.product.id]">
-                        ${{ Math.floor(products[entry.product.id].price) }}
+                    <div v-if="entry.product && entry.product.id && products[entry.product.id]?.promotionPrice !== undefined" class="flex flex-row">
+                      <div class="flex flex-col">
+                        <span class="text-red-600 font-bold text-3xl">
+                          <span>
+                            ${{ Math.floor(products[entry.product.id]?.promotionPrice ?? 0) }}
+                          </span>
+                          <span class="text-base align-middle">
+                            {{ ((products[entry.product.id]?.promotionPrice ?? 0) % 1).toFixed(2).slice(1) }}
+                          </span>
+                        </span>
+                      </div>
+                      <span class="text-gray-400 line-through text-xl ms-4">
+                        ${{ (products[entry.product.id]?.price ?? 0).toFixed(2) }}
                       </span>
-                      <span v-if="entry.product && entry.product.id && products[entry.product.id]"
-                                      class="text-base align-middle">
-                        {{ (products[entry.product.id].price % 1).toFixed(2).slice(1) }}
+                    </div>
+                    <div v-else>
+                      <span class="text-2xl font-bold">
+                        <span>${{ Math.floor(products[entry.product?.id ?? 0]?.price ?? 0) }}</span>
+                        <span class="text-base align-middle">{{ ((products[entry.product?.id ?? 0]?.price ?? 0) % 1).toFixed(2).slice(1) }}</span>
                       </span>
-                    </span>
+                    </div>
                     <div class="flex items-center mt-2">
                       <Button
                           icon="pi pi-minus"
@@ -238,7 +250,8 @@ const getStockName = (product: Product) => {
             </span>
           </div>
         </div>
-        <Button :label="t('product.checkout')" class="mt-4 w-full" severity="primary" @click="() => navigateTo('/checkout')"
+        <Button :label="t('product.checkout')" class="mt-4 w-full" severity="primary"
+                @click="() => navigateTo('/checkout')"
                 :disabled="cartEntries.length === 0"/>
       </template>
     </Card>

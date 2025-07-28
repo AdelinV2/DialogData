@@ -5,10 +5,7 @@ import com.dialogdata.main.dto.*;
 import com.dialogdata.main.entity.Product;
 import com.dialogdata.main.entity.ProductAttribute;
 import com.dialogdata.main.entity.ProductAttributeValue;
-import com.dialogdata.main.mapper.CategoryMapper;
-import com.dialogdata.main.mapper.ProductAttributeMapper;
-import com.dialogdata.main.mapper.ProductAttributeValueMapper;
-import com.dialogdata.main.mapper.ProductMapper;
+import com.dialogdata.main.mapper.*;
 import com.dialogdata.main.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +41,8 @@ public class ProductService {
     private final ImageClient imageClient;
     private final CsvService csvService;
     private final ReviewService reviewService;
+    private final DocumentService documentService;
+    private final DocumentMapper documentMapper;
 
     public ProductDto findProductDtoById(Integer id) {
 
@@ -53,13 +52,17 @@ public class ProductService {
             return null;
         }
 
-        List<ProductAttributeValue> attributes = productAttributeValueService.findByProductId(id);
-        CategoryDto category = categoryMapper.toDto(categoryService.findCategoryByProductId(id));
+        return this.setDtoFields(product);
+    }
+
+    private ProductDto setDtoFields(Product product) {
 
         ProductDto productDto = productMapper.toDto(product);
-        productDto.setAttributes(productAttributeValueMapper.toDtoList(attributes));
-        productDto.setCategory(category);
-        productDto.setAverageRating(reviewService.getAverageRatingByProductId(id));
+        productDto.setCategory(categoryMapper.toDto(categoryService.findCategoryByProductId(product.getId())));
+        productDto.setAttributes(productAttributeValueMapper.toDtoList(productAttributeValueService.findByProductId(product.getId())));
+        productDto.setAverageRating(reviewService.getAverageRatingByProductId(product.getId()));
+        productDto.setImages(getProductImagesByProductId(product.getId()));
+        productDto.setDocument(documentService.getDocumentByProductId(product.getId()));
 
         return productDto;
     }
@@ -68,12 +71,28 @@ public class ProductService {
         return productRepository.findById(id).orElse(null);
     }
 
+
+    @Transactional
+    public ProductDto createProduct(ProductDto productDto, MultipartFile file) {
+
+        ProductDto createdProductDto = createProduct(productDto);
+
+        if (file != null) {
+            try {
+                DocumentDto documentDto = documentService.createDocument(file, productMapper.toEntity(createdProductDto));
+                createdProductDto.setDocument(documentDto);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to upload document: " + e.getMessage(), e);
+            }
+        }
+
+        return createdProductDto;
+    }
+
     @Transactional
     public ProductDto createProduct(ProductDto productDto) {
-
         Product createdProduct = productRepository.save(productMapper.toEntity(productDto));
 
-        categoryProductListService.createCategoryProductList(categoryMapper.toEntity(productDto.getCategory()), createdProduct);
         for (ProductAttributeValueDto attribute : productDto.getAttributes()) {
             attribute.setProduct(productMapper.toDto(createdProduct));
             ProductAttribute savedAttribute = productAttributeService.create(productAttributeMapper.toEntity(attribute.getAttribute()));
@@ -81,16 +100,12 @@ public class ProductService {
             productAttributeValueService.create(attribute);
         }
 
-        ProductDto createdProductDto = productMapper.toDto(createdProduct);
-        createdProductDto.setCategory(categoryMapper.toDto(categoryService.findCategoryByProductId(createdProduct.getId())));
-        createdProductDto.setAttributes(productAttributeValueMapper.toDtoList(productAttributeValueService.findByProductId(createdProduct.getId())));
-
         for (ImageDto image : productDto.getImages()) {
-            image.setFileName(createdProductDto.getId() + "_" + image.getFileName());
+            image.setFileName(createdProduct.getId() + "_" + image.getFileName());
             imageClient.uploadImage(image);
         }
 
-        return createdProductDto;
+        return setDtoFields(createdProduct);
     }
 
     public Page<Product> getProducts(Pageable pageable) {
@@ -112,12 +127,33 @@ public class ProductService {
         return true;
     }
 
-    public Page<Product> getProductsByCategory(Integer categoryId, Pageable pageable) {
-        return productRepository.findAllByCategoryId(categoryId, pageable);
+    public Page<ProductDto> getProductsByCategory(Integer categoryId, Pageable pageable) {
+
+        Page<Product> products = productRepository.findAllByCategoryId(categoryId, pageable);
+
+        return products.map(this::setDtoFields);
     }
 
     @Transactional
-    public Product updateProduct(Integer id, ProductDto product) {
+    public ProductDto updateProduct(Integer id, ProductDto productDto, MultipartFile file) {
+
+        ProductDto updatedProduct = updateProduct(id, productDto);
+
+        if (file != null) {
+            try {
+                documentService.deleteDocumentByProductId(productDto.getId());
+                DocumentDto documentDto = documentService.createDocument(file, productMapper.toEntity(updatedProduct));
+                updatedProduct.setDocument(documentDto);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to upload document: " + e.getMessage(), e);
+            }
+        }
+
+        return setDtoFields(productRepository.findById(id).orElse(null));
+    }
+
+    @Transactional
+    public ProductDto updateProduct(Integer id, ProductDto product) {
 
         Product existingProduct = productRepository.findById(id).orElse(null);
 
@@ -135,7 +171,7 @@ public class ProductService {
             imageClient.uploadImage(image);
         }
 
-        return savedProduct;
+        return setDtoFields(savedProduct);
     }
 
     public List<ImageDto> getProductImagesByProductId(Integer productId) {
@@ -164,10 +200,12 @@ public class ProductService {
         }
     }
 
-    public Page<Product> getProductsByCategoryIdAndSearchAndAttribute(Pageable pageable, Integer categoryId, String search, List<String> attributeValue) {
+    public Page<ProductDto> getProductsByCategoryIdAndSearchAndAttribute(Pageable pageable, Integer categoryId, String search, List<String> attributeValue) {
 
-        return productRepository
+        Page<Product> products = productRepository
                 .findAllByCategoryIdAndNameContainingIgnoreCaseAndAttributeValue(categoryId, search, attributeValue, pageable);
+
+        return products.map(this::setDtoFields);
     }
 
     @Async
@@ -207,12 +245,10 @@ public class ProductService {
 
     public List<ProductDto> getPromotedProducts() {
 
-        List<ProductDto> promotedProducts = productMapper.toDtoList(productRepository.findAllByPromoted(true));
-
-        for (ProductDto product : promotedProducts) {
-            product.setImages(getProductImagesByProductId(product.getId()));
-            product.setAverageRating(reviewService.getAverageRatingByProductId(product.getId()));
-        }
+        List<Product> promotedProductsEntities = productRepository.findAllByPromoted(true);
+        List<ProductDto> promotedProducts = promotedProductsEntities.stream()
+                .map(this::setDtoFields)
+                .toList();
 
         return promotedProducts;
     }

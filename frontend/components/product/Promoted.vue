@@ -55,8 +55,8 @@ const addToCart = (product: Product) => {
   const cartItem = {
     product: product,
     quantity: 1,
-    pricePerPiece: product.price,
-    totalPricePerEntry: product.price,
+    pricePerPiece: product.promotionPrice || product.price,
+    totalPricePerEntry: product.promotionPrice || product.price,
   } as CartEntry
 
   $fetch(`${apiBaseUrl}/cart/add/${user.value.id}`, {

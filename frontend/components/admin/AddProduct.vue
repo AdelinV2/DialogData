@@ -9,6 +9,8 @@ const {user} = useUserStorage();
 const route = useRoute();
 const productId = route.params.id;
 const loading = ref(false);
+const document = ref<File | null>(null);
+const uploadedDocument = ref<File | null>(null);
 
 const product = ref<Product>({
   name: '',
@@ -54,9 +56,43 @@ async function processProductImages() {
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
     while (n--) u8arr[n] = bstr.charCodeAt(n);
-    const file = new File([u8arr], `${idx}.png`, { type: mime });
+    const file = new File([u8arr], `${idx}.png`, {type: mime});
     (file as any).objectURL = base64;
     uploadedFiles.value[idx] = file;
+  }
+}
+
+async function processDocument() {
+  if (!product.value.document)
+    return;
+
+  const doc = product.value.document;
+
+  if (doc.data) {
+    const [_, base64] = doc.data.includes(',') ? doc.data.split(',') : ['', doc.data];
+    const binary = atob(base64);
+    const len = binary.length;
+    const u8arr = new Uint8Array(len);
+
+    for (let i = 0; i < len; i++) {
+      u8arr[i] = binary.charCodeAt(i);
+    }
+
+    const file = new File([u8arr], doc.fileName, { type: doc.contentType });
+    (file as any).objectURL = URL.createObjectURL(file);
+    uploadedDocument.value = file;
+    document.value = file;
+  } else {
+    if (doc.fileName && doc.contentType) {
+      const file = new File([], doc.fileName, { type: doc.contentType });
+      (file as any).objectURL = URL.createObjectURL(file);
+      uploadedDocument.value = file;
+      document.value = file;
+    } else {
+      console.warn('Document data is empty or missing fileName/contentType');
+      uploadedDocument.value = null;
+      document.value = null;
+    }
   }
 }
 
@@ -68,6 +104,7 @@ if (productId) {
         product.value = response._data as Product;
 
         processProductImages();
+        processDocument();
 
         console.log('Product fetched successfully:', product.value);
       } else {
@@ -118,6 +155,40 @@ function onSelectedFiles(event: any) {
     (file as any).objectURL = URL.createObjectURL(file);
     return file;
   });
+}
+
+function handleDocumentSelect(files: File[], clearCallback: Function) {
+  const file = files[0];
+  if (file) {
+    (file as any).objectURL = URL.createObjectURL(file);
+    uploadedDocument.value = file;
+    document.value = file;
+  }
+  clearCallback();
+}
+
+function onDocumentUpload(event: any) {
+
+  const file = event.files[0];
+
+  if (file) {
+    if ((uploadedDocument.value as any)?.objectURL) {
+      URL.revokeObjectURL((uploadedDocument.value as any).objectURL);
+    }
+    (file as any).objectURL = URL.createObjectURL(file);
+    uploadedDocument.value = file;
+    document.value = file;
+  }
+}
+
+function removeUploadedDocument() {
+
+  if ((uploadedDocument.value as any)?.objectURL) {
+    URL.revokeObjectURL((uploadedDocument.value as any).objectURL);
+  }
+
+  uploadedDocument.value = null;
+  document.value = null;
 }
 
 function uploadEvent(callback: Function) {
@@ -199,10 +270,19 @@ $fetch(`${apiBaseUrl}/category`, {
 function onUpdate() {
 
   loading.value = true;
+  console.log('Updating product:', product.value);
+  console.log('Using document:', document.value);
+
+  const formData = new FormData();
+  formData.append('productDto', new Blob([JSON.stringify(product.value)], { type: 'application/json' }));
+
+  if (document.value) {
+    formData.append('file', document.value);
+  }
 
   $fetch(`${apiBaseUrl}/products/${productId}`, {
     method: 'PUT',
-    body: product.value,
+    body: formData,
     onResponse({response}) {
       if (response.status === 200) {
         console.log('Product updated successfully:', response._data);
@@ -235,6 +315,7 @@ function onSubmit() {
 
   $fetch(`${apiBaseUrl}/products`, {
     method: 'POST',
+    params: document,
     body: product.value,
     onResponse({response}) {
       if (response.status === 201) {
@@ -443,6 +524,69 @@ function addAttribute() {
           <label for="promoted">Promoted</label>
           <ToggleSwitch v-model="product.promoted"/>
         </div>
+
+
+        <div class="card">
+          <FileUpload
+            name="technicalDocument"
+            :custom-upload="true"
+            :multiple="false"
+            @upload="onDocumentUpload"
+          >
+            <template #header="{ chooseCallback, clearCallback, files }">
+              <Button
+                  @click="chooseCallback()"
+                  icon="pi pi-folder-open"
+                  label="Select Document"
+                  outlined
+              />
+              <Button
+                  @click="handleDocumentSelect(files, clearCallback)"
+                  icon="pi pi-upload"
+                  label="Upload"
+                  outlined
+                  :disabled="!files || files.length === 0"
+              />
+              <Button
+                  @click="clearCallback()"
+                  icon="pi pi-times"
+                  label="Clear"
+                  outlined
+                  :disabled="!files || files.length === 0"
+              />
+            </template>
+            <template #empty>
+              <span>Drag and drop technical file here.</span>
+            </template>
+          </FileUpload>
+          <div v-if="uploadedDocument" class="mt-4">
+            <h5 class="mb-2">Uploaded Document</h5>
+            <div class="p-8 rounded-border flex flex-col border border-surface items-center gap-4">
+              <i class="pi pi-file" style="font-size: 2rem;"></i>
+              <span class="font-semibold text-ellipsis max-w-60 whitespace-nowrap overflow-hidden">
+                 {{ uploadedDocument.name }}
+               </span>
+              <div>{{ formatSize(uploadedDocument.size) }}</div>
+              <Badge value="Completed" severity="success"/>
+              <Button
+                  icon="pi pi-times"
+                  @click="removeUploadedDocument"
+                  outlined
+                  rounded
+                  severity="danger"
+              />
+              <a v-if="(uploadedDocument as any).objectURL"
+                 :href="(uploadedDocument as any).objectURL"
+                 :download="uploadedDocument.name"
+                 class="mt-2"
+              >
+                <span class="pi pi-download"></span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+
         <InputGroup>
           <div class="card w-full">
             <Toast/>
@@ -463,7 +607,7 @@ function addAttribute() {
               <template #content="{ removeFileCallback }">
                 <div class="flex flex-col gap-8 pt-4">
                   <div v-if="files.length > 0">
-                    <h5>Pending</h5>
+                    <h5 class="mb-2">Pending</h5>
                     <div class="flex flex-wrap gap-4">
                       <div
                           v-for="(file, index) in files"
@@ -494,7 +638,7 @@ function addAttribute() {
                   </div>
 
                   <div v-if="uploadedFiles.length > 0">
-                    <h5>Completed</h5>
+                    <h5 class="mb-2">Completed</h5>
                     <div class="flex flex-wrap gap-4">
                       <div
                           v-for="(file, index) in uploadedFiles"

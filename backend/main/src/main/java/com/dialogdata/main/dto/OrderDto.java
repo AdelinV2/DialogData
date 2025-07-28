@@ -1,7 +1,7 @@
 package com.dialogdata.main.dto;
 
 import com.dialogdata.main.entity.Order;
-import com.dialogdata.main.util.PaymentType;
+import com.dialogdata.main.enums.PaymentType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

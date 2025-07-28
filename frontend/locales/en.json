@@ -63,7 +63,9 @@
     "value": "Value",
     "shoppingCart": "Shopping Cart",
     "checkout": "Checkout",
-    "sale": "Sale"
+    "sale": "Sale",
+    "document": "Technical Document",
+    "documentSize": "Document Size"
   },
   "resetPassword": {
     "resetPassword": "Reset Password",

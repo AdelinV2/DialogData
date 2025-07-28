@@ -4,6 +4,7 @@ import type {Cart} from "~/types/cart";
 import type {Order} from "~/types/order";
 import type {Address} from "~/types/address";
 import {navigateTo} from "#app";
+import {OrderStatus} from "~/types/orderStatus";
 
 const {user} = useUserStorage();
 const {t} = useI18n();
@@ -93,6 +94,7 @@ const confirmOrder = () => {
     } as Address,
     totalPrice: cart.value?.totalPrice,
     orderDate: new Date(),
+    status: selectedPayment.value === 'CASH' ? OrderStatus.PENDING : OrderStatus.PROCESSING,
   } as Order;
 
   console.log(orderDetails);

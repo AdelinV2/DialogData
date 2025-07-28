@@ -1,6 +1,7 @@
 package com.dialogdata.main.entity;
 
-import com.dialogdata.main.util.PaymentType;
+import com.dialogdata.main.enums.OrderStatus;
+import com.dialogdata.main.enums.PaymentType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -53,5 +54,11 @@ public class Order {
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "order_date", nullable = false)
     private LocalDate orderDate;
+
+    @NotNull
+    @Column(name = "status", nullable = false)
+    @ColumnDefault(value = "0")
+    @Enumerated(EnumType.ORDINAL)
+    private OrderStatus status;
 
 }

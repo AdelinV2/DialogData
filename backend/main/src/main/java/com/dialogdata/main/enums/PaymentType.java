@@ -1,4 +1,4 @@
-package com.dialogdata.main.util;
+package com.dialogdata.main.enums;
 
 public enum PaymentType {
     CREDIT_CARD("Credit Card"),

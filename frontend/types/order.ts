@@ -1,5 +1,6 @@
 import type {Cart} from "~/types/cart";
 import type {Address} from "~/types/address";
+import type {OrderStatus} from "~/types/orderStatus";
 
 export interface Order {
     id?: number;
@@ -10,4 +11,5 @@ export interface Order {
     invoiceAddress: Address;
     totalPrice: number;
     orderDate: Date;
+    status: OrderStatus
 }

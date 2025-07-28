@@ -11,6 +11,8 @@ const props = defineProps<{
 const {user} = useUserStorage();
 const {t} = useI18n();
 const quantity = ref(1);
+const documentFile = ref<File | null>(null);
+const documentUrl = ref<string | null>(null);
 
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 const toast = useToast();
@@ -35,8 +37,8 @@ const onAddToCart = () => {
   const cartItem = {
     product: props.product,
     quantity: quantity.value,
-    pricePerPiece: props.product.price,
-    totalPricePerEntry: props.product.price,
+    pricePerPiece: props.product.promotionPrice || props.product.price,
+    totalPricePerEntry: (props.product.promotionPrice || props.product.price) * quantity.value,
   } as CartEntry
 
   $fetch(`${apiBaseUrl}/cart/add/${user.value.id}`, {
@@ -82,6 +84,31 @@ const getStockLabel = () => {
   else if (props.product.availableQuantity > 0) return t('product.limitedStock');
   else return t('product.outOfStock');
 };
+
+onMounted(() => {
+  const doc = props.product.document;
+
+  if (doc?.data) {
+    const [_, base64] = doc.data.includes(',') ? doc.data.split(',') : ['', doc.data];
+    const binary = atob(base64);
+    const len = binary.length;
+    const u8arr = new Uint8Array(len);
+
+    for (let i = 0; i < len; i++) {
+      u8arr[i] = binary.charCodeAt(i);
+    }
+
+    const file = new File([u8arr], doc.fileName, { type: doc.contentType });
+    documentFile.value = file;
+    documentUrl.value = URL.createObjectURL(file);
+  }
+});
+
+onUnmounted(() => {
+  if (documentUrl.value) {
+    URL.revokeObjectURL(documentUrl.value);
+  }
+});
 
 </script>
 
@@ -194,6 +221,32 @@ const getStockLabel = () => {
                 <Column field="attribute.name" :header="t('product.name')"></Column>
                 <Column field="value" :header="t('product.value')"></Column>
               </DataTable>
+            </div>
+          </AccordionContent>
+        </AccordionPanel>
+        <AccordionPanel value="2" v-if="props.product.document">
+          <AccordionHeader>{{ t('product.document') }}</AccordionHeader>
+          <AccordionContent>
+            <div class="flex flex-col gap-2">
+              <a
+                v-if="documentUrl"
+                :href="documentUrl"
+                target="_blank"
+                :download="props.product.document.fileName"
+                class="text-blue-600 hover:underline"
+              >
+                {{ props.product.document.fileName }}
+              </a>
+              <span v-else class="text-gray-500">{{ t('product.noDocumentAvailable') }}</span>
+              <span v-if="documentFile" class="text-sm text-gray-500">
+               {{ t('product.documentSize') }} {{
+                 documentFile?.size
+                   ? (documentFile.size >= 1024 * 1024
+                       ? (documentFile.size / (1024 * 1024)).toFixed(2) + ' MB'
+                       : (documentFile.size / 1024).toFixed(2) + ' KB')
+                   : '0.00 KB'
+               }}
+              </span>
             </div>
           </AccordionContent>
         </AccordionPanel>

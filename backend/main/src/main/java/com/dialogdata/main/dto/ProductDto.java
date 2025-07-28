@@ -50,4 +50,6 @@ public class ProductDto implements Serializable {
     BigDecimal promotionPrice;
 
     BigDecimal averageRating;
+
+    DocumentDto document;
 }

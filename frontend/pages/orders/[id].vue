@@ -8,6 +8,8 @@ const {user} = useUserStorage();
 const {t} = useI18n();
 const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl;
 const order = ref<Order | null>(null);
+const dialogVisible = ref(false);
+const toast = useToast();
 
 onMounted(() => {
   if (!user.value) {
@@ -47,17 +49,68 @@ const fetchOrder = () => {
   });
 }
 
+const updateOrder = (updatedOrder: Order) => {
+  $fetch(`${apiBaseUrl}/order/${updatedOrder.id}`, {
+    method: 'PUT',
+    body: updatedOrder,
+    onResponse({response}) {
+      if (response.status === 200) {
+        order.value = response._data as Order;
+        dialogVisible.value = false;
+        toast.add({
+          severity: 'success',
+          summary: t('order.updateSuccess'),
+          detail: t('order.orderUpdated'),
+          life: 3000
+        });
+        console.log('Order updated successfully');
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: t('order.updateError'),
+          detail: t('order.orderUpdateFailed'),
+          life: 3000
+        });
+        console.error('Failed to update order');
+      }
+    }
+  }).catch((error) => {
+    toast.add({
+      severity: 'error',
+      summary: t('order.updateError'),
+      detail: t('order.orderUpdateFailed'),
+      life: 3000
+    });
+    console.error('Error updating order:', error);
+  });
+}
+
 </script>
 
 <template>
 
+  <Toast />
   <Navbar/>
 
   <div v-if="order" class="container mx-auto py-10 min-h-[calc(100vh-250px)]">
-    <div>
-      <h1 class="text-3xl font-bold">{{ t('order.order') }} #{{ order.id }}</h1>
-      <div class="text-gray-500 text-lg">{{t('order.orderDate')}}: {{ order.orderDate }}</div>
+    <div class="flex flex-col md:flex-row items-center mb-6">
+      <div>
+        <h1 class="text-3xl font-bold">{{ t('order.order') }} #{{ order.id }}</h1>
+        <div class="text-gray-500 text-lg">{{ t('order.orderDate') }}: {{ order.orderDate }}</div>
+      </div>
+      <Button v-if="user.role === 'ADMIN'" class="ml-auto" @click="dialogVisible = true">
+        {{ t('order.editOrder') }}
+      </Button>
     </div>
+
+    <Dialog v-model="dialogVisible" :header="t('order.editOrder')" :modal="true" :closable="true">
+      <template #footer>
+        <Button label="Cancel" @click="dialogVisible = false" class="p-button-text" />
+        <Button label="Save" @click="updateOrder(order)" class="p-button-primary" />
+      </template>
+      <label>{{ t('order.orderStatus') }}</label>
+      <Dropdown v-model="order.status" :options="['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED']" />
+    </Dialog>
 
     <div class="flex flex-col md:flex-row gap-6">
       <Card class="flex-1">
@@ -67,7 +120,7 @@ const fetchOrder = () => {
             <div>{{ order.deliveryAddress.streetLine }}</div>
             <div>{{ order.deliveryAddress.city }}, {{ order.deliveryAddress.postalCode }}</div>
             <div>{{ order.deliveryAddress.country }}</div>
-            <div>{{t('order.phoneNumber')}}: {{ user.phoneNumber }}</div>
+            <div>{{ t('order.phoneNumber') }}: {{ user.phoneNumber }}</div>
           </div>
         </template>
       </Card>
@@ -88,7 +141,7 @@ const fetchOrder = () => {
         <template #content>
           <div class="mb-2">
             <span class="font-semibold">{{ t('order.paymentMethod') }}:</span>
-            <Tag :value="order.paymentType" class="ml-2" />
+            <Tag :value="order.paymentType" class="ml-2"/>
           </div>
           <div class="mt-4">
             <span class="font-semibold">{{ t('order.totalPrice') }}:</span>
@@ -118,7 +171,7 @@ const fetchOrder = () => {
               </div>
             </template>
           </Column>
-          <Column field="quantity" :header="t('order.quantity')" />
+          <Column field="quantity" :header="t('order.quantity')"/>
           <Column field="pricePerPiece" :header="t('order.pricePerPiece')">
             <template #body="{ data }">
               ${{ data.pricePerPiece.toFixed(2) }}

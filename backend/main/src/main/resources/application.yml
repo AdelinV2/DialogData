@@ -23,6 +23,11 @@ spring:
           starttls:
             enable: true
 
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

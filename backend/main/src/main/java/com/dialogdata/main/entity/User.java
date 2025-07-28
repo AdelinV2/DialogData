@@ -1,6 +1,6 @@
 package com.dialogdata.main.entity;
 
-import com.dialogdata.main.util.Role;
+import com.dialogdata.main.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;

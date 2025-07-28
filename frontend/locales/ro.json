@@ -63,7 +63,9 @@
     "value": "Valoare",
     "shoppingCart": "Coș de cumpărături",
     "checkout": "Finalizare comandă",
-    "sale": "Reducere"
+    "sale": "Reducere",
+    "document": "Document tehnic",
+    "documentSize": "Dimensiune document"
   },
   "resetPassword": {
     "resetPassword": "Resetează parola",

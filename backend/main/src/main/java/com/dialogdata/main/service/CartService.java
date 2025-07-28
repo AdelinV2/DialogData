@@ -141,7 +141,7 @@ public class CartService {
     @Transactional
     public Cart removeProductFromCart(Integer productId, Integer userId) {
 
-        Cart cart = findByUserId(userId);
+        Cart cart = this.findActiveByUserId(userId);
 
         if (cart == null) {
             return null;
@@ -153,6 +153,7 @@ public class CartService {
             return null;
         }
 
+        cart.getCartEntries().remove(cartEntry);
         cart.setTotalPrice(cart.getTotalPrice().subtract(cartEntry.getPricePerPiece().multiply(BigDecimal.valueOf(cartEntry.getQuantity()))));
         cartEntryService.delete(cartEntry.getId());
 

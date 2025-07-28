@@ -1,7 +1,7 @@
 package com.dialogdata.main.dto;
 
 import com.dialogdata.main.entity.User;
-import com.dialogdata.main.util.Role;
+import com.dialogdata.main.enums.Role;
 import jakarta.validation.constraints.*;
 import lombok.*;
 

@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,8 +42,6 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
 
-        product.setImages(productService.getProductImagesByProductId(id));
-
         return ResponseEntity.ok(product);
     }
 
@@ -51,9 +50,11 @@ public class ProductController {
     @ApiResponse(responseCode = "400", description = "Invalid product data")
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@Parameter(description = "Product to create", required = true)
-                                                    @RequestBody @Valid ProductDto product) {
+                                                    @RequestBody @Valid ProductDto product,
+                                                    @Parameter(description = "Document file", required = false)
+                                                    @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        return ResponseEntity.status(201).body(productService.createProduct(product));
+        return ResponseEntity.status(201).body(productService.createProduct(product, file));
     }
 
     @Operation(summary = "Get all products with pagination")
@@ -70,15 +71,9 @@ public class ProductController {
             @RequestParam(value = "attributeValue", required = false) List<String> attributeValue
     ) {
 
-        Page<Product> products = productService.getProductsByCategoryIdAndSearchAndAttribute(pageable, categoryId, search, attributeValue);
+        Page<ProductDto> products = productService.getProductsByCategoryIdAndSearchAndAttribute(pageable, categoryId, search, attributeValue);
 
-        Page<ProductDto> productDtos = products.map(product -> {
-            ProductDto dto = productMapper.toDto(product);
-            dto.setImages(productService.getProductImagesByProductId(product.getId()));
-            return dto;
-        });
-
-        return ResponseEntity.ok(productDtos);
+        return ResponseEntity.ok(products);
     }
 
     @Operation(summary = "Get products by category ID with pagination")
@@ -91,39 +86,35 @@ public class ProductController {
             @PathVariable("categoryId") Integer categoryId,
             Pageable pageable) {
 
-        Page<Product> products = productService.getProductsByCategory(categoryId, pageable);
+        Page<ProductDto> products = productService.getProductsByCategory(categoryId, pageable);
 
         if (products.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        Page<ProductDto> productDtos = products.map(product -> {
-            ProductDto dto = productMapper.toDto(product);
-            dto.setImages(productService.getProductImagesByProductId(product.getId()));
-            return dto;
-        });
-
-        return ResponseEntity.ok(productDtos);
+        return ResponseEntity.ok(products);
     }
 
     @Operation(summary = "Update a product by ID")
     @ApiResponse(responseCode = "200", description = "Product updated")
     @ApiResponse(responseCode = "400", description = "Invalid product data")
     @ApiResponse(responseCode = "404", description = "Product not found")
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductDto> updateProduct(
             @Parameter(description = "ID of the product to update", required = true)
             @PathVariable("id") Integer id,
             @Parameter(description = "Updated product data", required = true)
-            @RequestBody @Valid ProductDto productDto) {
+            @RequestPart("productDto") @Valid ProductDto productDto,
+            @Parameter(description = "Document file for the product", required = false)
+            @RequestPart(value = "file", required = false) MultipartFile file) {
 
-        Product updatedProduct = productService.updateProduct(id, productDto);
+        ProductDto updatedProduct = productService.updateProduct(id, productDto, file);
 
         if (updatedProduct == null) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(productMapper.toDto(updatedProduct));
+        return ResponseEntity.ok(updatedProduct);
     }
 
     @Operation(summary = "Delete a product by ID")
